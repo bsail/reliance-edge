@@ -34,6 +34,7 @@
 */
 #include <redfs.h>
 #include <redcore.h>
+#include <subsystems/data/xmem.h>
 
 
 #if DINDIR_POINTERS > 0U
@@ -167,8 +168,14 @@ static void BufferEndianSwapIndir(INDIR *pIndir);
 #endif
 
 
-static BUFFERCTX gBufCtx;
+// static BUFFERCTX gBufCtx;
 
+#ifndef TEST
+static BUFFERCTX *gBufCtx = (BUFFERCTX *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER);
+#else
+static BUFFERCTX gBufCtxHolder;
+static BUFFERCTX *gBufCtx = &gBufCtxHolder;
+#endif
 
 /** @brief Initialize the buffers.
 */
@@ -176,15 +183,20 @@ void RedBufferInit(void)
 {
     uint8_t bIdx;
 
-    RedMemSet(&gBufCtx, 0U, sizeof(gBufCtx));
+    // #ifdef TEST
+    // RedMemSet(&gBufCtx, 0U, sizeof(gBufCtx));
+    // #else
+    RedMemSet(gBufCtx, 0U, BUFFERCTX_SIZE);/* Теперь ведь у нас указатель! */
+    // #endif
+
 
     for(bIdx = 0U; bIdx < REDCONF_BUFFER_COUNT; bIdx++)
     {
         /*  When the buffers have been freshly initialized, acquire the buffers
             in the order in which they appear in the array.
         */
-        gBufCtx.abMRU[bIdx] = (uint8_t)((REDCONF_BUFFER_COUNT - bIdx) - 1U);
-        gBufCtx.aHead[bIdx].ulBlock = BBLK_INVALID;
+        gBufCtx->abMRU[bIdx] = (uint8_t)((REDCONF_BUFFER_COUNT - bIdx) - 1U);
+        gBufCtx->aHead[bIdx].ulBlock = BBLK_INVALID;
     }
 }
 
@@ -228,13 +240,13 @@ REDSTATUS RedBufferGet(
                 was requested.
             */
             if(    ((uFlags & BFLAG_NEW) != 0U)
-                || ((uFlags & BFLAG_META_MASK) != (gBufCtx.aHead[bIdx].uFlags & BFLAG_META_MASK)))
+                || ((uFlags & BFLAG_META_MASK) != (gBufCtx->aHead[bIdx].uFlags & BFLAG_META_MASK)))
             {
                 CRITICAL_ERROR();
                 ret = -RED_EFUBAR;
             }
         }
-        else if(gBufCtx.uNumUsed == REDCONF_BUFFER_COUNT)
+        else if(gBufCtx->uNumUsed == REDCONF_BUFFER_COUNT)
         {
             /*  The MINIMUM_BUFFER_COUNT is supposed to ensure that no operation
                 ever runs out of buffers, so this should never happen.
@@ -251,14 +263,14 @@ REDSTATUS RedBufferGet(
             */
             for(bIdx = (uint8_t)(REDCONF_BUFFER_COUNT - 1U); bIdx > 0U; bIdx--)
             {
-                if(gBufCtx.aHead[gBufCtx.abMRU[bIdx]].bRefCount == 0U)
+                if(gBufCtx->aHead[gBufCtx->abMRU[bIdx]].bRefCount == 0U)
                 {
                     break;
                 }
             }
 
-            bIdx = gBufCtx.abMRU[bIdx];
-            pHead = &gBufCtx.aHead[bIdx];
+            bIdx = gBufCtx->abMRU[bIdx];
+            pHead = &gBufCtx->aHead[bIdx];
 
             if(pHead->bRefCount == 0U)
             {
@@ -278,7 +290,7 @@ REDSTATUS RedBufferGet(
             else
             {
                 /*  All the buffers are used, which should have been caught by
-                    checking gBufCtx.uNumUsed.
+                    checking gBufCtx->uNumUsed.
                 */
                 CRITICAL_ERROR();
                 ret = -RED_EBUSY;
@@ -299,11 +311,11 @@ REDSTATUS RedBufferGet(
                     */
                     pHead->ulBlock = BBLK_INVALID;
 
-                    ret = RedIoRead(gbRedVolNum, ulBlock, 1U, gBufCtx.b.aabBuffer[bIdx]);
+                    ret = RedIoRead(gbRedVolNum, ulBlock, 1U, gBufCtx->b.aabBuffer[bIdx]);
 
                     if((ret == 0) && ((uFlags & BFLAG_META) != 0U))
                     {
-                        if(!BufferIsValid(gBufCtx.b.aabBuffer[bIdx], uFlags))
+                        if(!BufferIsValid(gBufCtx->b.aabBuffer[bIdx], uFlags))
                         {
                             /*  A corrupt metadata node is usually a critical
                                 error.  The master block is an exception since
@@ -319,13 +331,13 @@ REDSTATUS RedBufferGet(
                   #ifdef REDCONF_ENDIAN_SWAP
                     if(ret == 0)
                     {
-                        BufferEndianSwap(gBufCtx.b.aabBuffer[bIdx], uFlags);
+                        BufferEndianSwap(gBufCtx->b.aabBuffer[bIdx], uFlags);
                     }
                   #endif
                 }
                 else
                 {
-                    RedMemSet(gBufCtx.b.aabBuffer[bIdx], 0U, REDCONF_BLOCK_SIZE);
+                    RedMemSet(gBufCtx->b.aabBuffer[bIdx], 0U, REDCONF_BLOCK_SIZE);
                 }
             }
 
@@ -344,13 +356,13 @@ REDSTATUS RedBufferGet(
         */
         if(ret == 0)
         {
-            BUFFERHEAD *pHead = &gBufCtx.aHead[bIdx];
+            BUFFERHEAD *pHead = &gBufCtx->aHead[bIdx];
 
             pHead->bRefCount++;
 
             if(pHead->bRefCount == 1U)
             {
-                gBufCtx.uNumUsed++;
+                gBufCtx->uNumUsed++;
             }
 
             /*  BFLAG_NEW tells this function to zero the buffer instead of
@@ -361,7 +373,7 @@ REDSTATUS RedBufferGet(
 
             BufferMakeMRU(bIdx);
 
-            *ppBuffer = gBufCtx.b.aabBuffer[bIdx];
+            *ppBuffer = gBufCtx->b.aabBuffer[bIdx];
         }
     }
 
@@ -384,13 +396,13 @@ void RedBufferPut(
     }
     else
     {
-        REDASSERT(gBufCtx.aHead[bIdx].bRefCount > 0U);
-        gBufCtx.aHead[bIdx].bRefCount--;
+        REDASSERT(gBufCtx->aHead[bIdx].bRefCount > 0U);
+        gBufCtx->aHead[bIdx].bRefCount--;
 
-        if(gBufCtx.aHead[bIdx].bRefCount == 0U)
+        if(gBufCtx->aHead[bIdx].bRefCount == 0U)
         {
-            REDASSERT(gBufCtx.uNumUsed > 0U);
-            gBufCtx.uNumUsed--;
+            REDASSERT(gBufCtx->uNumUsed > 0U);
+            gBufCtx->uNumUsed--;
         }
     }
 }
@@ -428,7 +440,7 @@ REDSTATUS RedBufferFlush(
 
         for(bIdx = 0U; bIdx < REDCONF_BUFFER_COUNT; bIdx++)
         {
-            BUFFERHEAD *pHead = &gBufCtx.aHead[bIdx];
+            BUFFERHEAD *pHead = &gBufCtx->aHead[bIdx];
 
             if(    (pHead->bVolNum == gbRedVolNum)
                 && (pHead->ulBlock != BBLK_INVALID)
@@ -469,9 +481,9 @@ void RedBufferDirty(
     }
     else
     {
-        REDASSERT(gBufCtx.aHead[bIdx].bRefCount > 0U);
+        REDASSERT(gBufCtx->aHead[bIdx].bRefCount > 0U);
 
-        gBufCtx.aHead[bIdx].uFlags |= BFLAG_DIRTY;
+        gBufCtx->aHead[bIdx].uFlags |= BFLAG_DIRTY;
     }
 }
 
@@ -494,7 +506,7 @@ void RedBufferBranch(
     }
     else
     {
-        BUFFERHEAD *pHead = &gBufCtx.aHead[bIdx];
+        BUFFERHEAD *pHead = &gBufCtx->aHead[bIdx];
 
         REDASSERT(pHead->bRefCount > 0U);
         REDASSERT((pHead->uFlags & BFLAG_DIRTY) == 0U);
@@ -521,13 +533,13 @@ void RedBufferDiscard(
     }
     else
     {
-        REDASSERT(gBufCtx.aHead[bIdx].bRefCount == 1U);
-        REDASSERT(gBufCtx.uNumUsed > 0U);
+        REDASSERT(gBufCtx->aHead[bIdx].bRefCount == 1U);
+        REDASSERT(gBufCtx->uNumUsed > 0U);
 
-        gBufCtx.aHead[bIdx].bRefCount = 0U;
-        gBufCtx.aHead[bIdx].ulBlock = BBLK_INVALID;
+        gBufCtx->aHead[bIdx].bRefCount = 0U;
+        gBufCtx->aHead[bIdx].ulBlock = BBLK_INVALID;
 
-        gBufCtx.uNumUsed--;
+        gBufCtx->uNumUsed--;
 
         BufferMakeLRU(bIdx);
     }
@@ -567,7 +579,7 @@ REDSTATUS RedBufferDiscardRange(
 
         for(bIdx = 0U; bIdx < REDCONF_BUFFER_COUNT; bIdx++)
         {
-            BUFFERHEAD *pHead = &gBufCtx.aHead[bIdx];
+            BUFFERHEAD *pHead = &gBufCtx->aHead[bIdx];
 
             if(    (pHead->bVolNum == gbRedVolNum)
                 && (pHead->ulBlock != BBLK_INVALID)
@@ -745,15 +757,15 @@ static bool BufferToIdx(
         */
         for(bIdx = 0U; bIdx < REDCONF_BUFFER_COUNT; bIdx++)
         {
-            if(pBuffer == &gBufCtx.b.aabBuffer[bIdx][0U])
+            if(pBuffer == &gBufCtx->b.aabBuffer[bIdx][0U])
             {
                 break;
             }
         }
 
         if(    (bIdx < REDCONF_BUFFER_COUNT)
-            && (gBufCtx.aHead[bIdx].ulBlock != BBLK_INVALID)
-            && (gBufCtx.aHead[bIdx].bVolNum == gbRedVolNum))
+            && (gBufCtx->aHead[bIdx].ulBlock != BBLK_INVALID)
+            && (gBufCtx->aHead[bIdx].bVolNum == gbRedVolNum))
         {
             *pbIdx = bIdx;
             fRet = true;
@@ -782,21 +794,21 @@ static REDSTATUS BufferWrite(
 
     if(bIdx < REDCONF_BUFFER_COUNT)
     {
-        const BUFFERHEAD *pHead = &gBufCtx.aHead[bIdx];
+        const BUFFERHEAD *pHead = &gBufCtx->aHead[bIdx];
 
         REDASSERT((pHead->uFlags & BFLAG_DIRTY) != 0U);
 
         if((pHead->uFlags & BFLAG_META) != 0U)
         {
-            ret = BufferFinalize(gBufCtx.b.aabBuffer[bIdx], pHead->uFlags);
+            ret = BufferFinalize(gBufCtx->b.aabBuffer[bIdx], pHead->uFlags);
         }
 
         if(ret == 0)
         {
-            ret = RedIoWrite(pHead->bVolNum, pHead->ulBlock, 1U, gBufCtx.b.aabBuffer[bIdx]);
+            ret = RedIoWrite(pHead->bVolNum, pHead->ulBlock, 1U, gBufCtx->b.aabBuffer[bIdx]);
 
           #ifdef REDCONF_ENDIAN_SWAP
-            BufferEndianSwap(gBufCtx.b.aabBuffer[bIdx], pHead->uFlags);
+            BufferEndianSwap(gBufCtx->b.aabBuffer[bIdx], pHead->uFlags);
           #endif
         }
     }
@@ -1083,7 +1095,7 @@ static void BufferMakeLRU(
     {
         REDERROR();
     }
-    else if(bIdx != gBufCtx.abMRU[REDCONF_BUFFER_COUNT - 1U])
+    else if(bIdx != gBufCtx->abMRU[REDCONF_BUFFER_COUNT - 1U])
     {
         uint8_t bMruIdx;
 
@@ -1093,7 +1105,7 @@ static void BufferMakeLRU(
         */
         for(bMruIdx = 0U; bMruIdx < (REDCONF_BUFFER_COUNT - 1U); bMruIdx++)
         {
-            if(bIdx == gBufCtx.abMRU[bMruIdx])
+            if(bIdx == gBufCtx->abMRU[bMruIdx])
             {
                 break;
             }
@@ -1104,8 +1116,8 @@ static void BufferMakeLRU(
             /*  Move the buffer index to the back of the MRU array, making it
                 the LRU buffer.
             */
-            RedMemMove(&gBufCtx.abMRU[bMruIdx], &gBufCtx.abMRU[bMruIdx + 1U], REDCONF_BUFFER_COUNT - ((uint32_t)bMruIdx + 1U));
-            gBufCtx.abMRU[REDCONF_BUFFER_COUNT - 1U] = bIdx;
+            RedMemMove(&gBufCtx->abMRU[bMruIdx], &gBufCtx->abMRU[bMruIdx + 1U], REDCONF_BUFFER_COUNT - ((uint32_t)bMruIdx + 1U));
+            gBufCtx->abMRU[REDCONF_BUFFER_COUNT - 1U] = bIdx;
         }
         else
         {
@@ -1131,7 +1143,7 @@ static void BufferMakeMRU(
     {
         REDERROR();
     }
-    else if(bIdx != gBufCtx.abMRU[0U])
+    else if(bIdx != gBufCtx->abMRU[0U])
     {
         uint8_t bMruIdx;
 
@@ -1141,7 +1153,7 @@ static void BufferMakeMRU(
         */
         for(bMruIdx = 1U; bMruIdx < REDCONF_BUFFER_COUNT; bMruIdx++)
         {
-            if(bIdx == gBufCtx.abMRU[bMruIdx])
+            if(bIdx == gBufCtx->abMRU[bMruIdx])
             {
                 break;
             }
@@ -1152,8 +1164,8 @@ static void BufferMakeMRU(
             /*  Move the buffer index to the front of the MRU array, making it
                 the MRU buffer.
             */
-            RedMemMove(&gBufCtx.abMRU[1U], &gBufCtx.abMRU[0U], bMruIdx);
-            gBufCtx.abMRU[0U] = bIdx;
+            RedMemMove(&gBufCtx->abMRU[1U], &gBufCtx->abMRU[0U], bMruIdx);
+            gBufCtx->abMRU[0U] = bIdx;
         }
         else
         {
@@ -1196,7 +1208,7 @@ static bool BufferFind(
 
         for(bIdx = 0U; bIdx < REDCONF_BUFFER_COUNT; bIdx++)
         {
-            const BUFFERHEAD *pHead = &gBufCtx.aHead[bIdx];
+            const BUFFERHEAD *pHead = &gBufCtx->aHead[bIdx];
 
             if((pHead->bVolNum == gbRedVolNum) && (pHead->ulBlock == ulBlock))
             {
