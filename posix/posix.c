@@ -86,6 +86,7 @@
 #define HFLAG_WRITEABLE 0x04U   /* Handle is writeable. */
 #define HFLAG_APPENDING 0x08U   /* Handle was opened in append mode. */
 
+#ifndef TEST
 /*  @brief Handle structure, used to implement file descriptors and directory
            streams.
 */
@@ -99,7 +100,7 @@ typedef struct sREDHANDLE
     REDDIRENT       dirent;     /**< Dirent structure returned by red_readdir(). */
   #endif
 } REDHANDLE;
-
+#endif
 /*-------------------------------------------------------------------
     Tasks
 -------------------------------------------------------------------*/

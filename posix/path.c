@@ -34,9 +34,11 @@
 #include <redposix.h>
 #include <redpath.h>
 
+#include <config.h>
+
 
 static REDSTATUS PathWalk(uint32_t ulCwdInode, const char *pszLocalPath, uint32_t *pulPInode, const char **ppszName, uint32_t *pulInode);
-static bool IsRootDir(const char *pszLocalPath);
+STATIC bool IsRootDir(const char *pszLocalPath);
 static bool PathHasMoreComponents(const char *pszPathIdx);
 #if REDCONF_API_POSIX_CWD == 1
 static bool IsDot(const char *pszPathComponent);
@@ -550,7 +552,7 @@ static REDSTATUS PathWalk(
     @retval true    @p pszLocalPath names the root directory.
     @retval false   @p pszLocalPath does not name the root directory.
 */
-static bool IsRootDir(
+STATIC bool IsRootDir(
     const char *pszLocalPath)
 {
     bool        fRet;

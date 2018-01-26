@@ -34,6 +34,11 @@ REDSTATUS RedPathVolumeLookup(const char *pszVolume, uint8_t *pbVolNum);
 REDSTATUS RedPathLookup(uint32_t ulCwdInode, const char *pszLocalPath, uint32_t *pulInode);
 REDSTATUS RedPathToName(uint32_t ulCwdInode, const char *pszLocalPath, uint32_t *pulPInode, const char **ppszName);
 
+#ifdef TEST
+
+bool IsRootDir(const char *pszLocalPath);
+
+#endif
 
 #endif
 
