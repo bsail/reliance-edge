@@ -37,6 +37,7 @@ REDSTATUS RedPathToName(uint32_t ulCwdInode, const char *pszLocalPath, uint32_t 
 #ifdef TEST
 
 bool IsRootDir(const char *pszLocalPath);
+bool PathHasMoreComponents(const char *pszPathIdx);
 
 #endif
 

@@ -39,7 +39,7 @@
 
 static REDSTATUS PathWalk(uint32_t ulCwdInode, const char *pszLocalPath, uint32_t *pulPInode, const char **ppszName, uint32_t *pulInode);
 STATIC bool IsRootDir(const char *pszLocalPath);
-static bool PathHasMoreComponents(const char *pszPathIdx);
+STATIC bool PathHasMoreComponents(const char *pszPathIdx);
 #if REDCONF_API_POSIX_CWD == 1
 static bool IsDot(const char *pszPathComponent);
 static bool IsDotDot(const char *pszPathComponent);
@@ -606,7 +606,7 @@ STATIC bool IsRootDir(
     @retval true    @p pszPathIdx has more components.
     @retval false   @p pszPathIdx has no more components.
 */
-static bool PathHasMoreComponents(
+STATIC bool PathHasMoreComponents(
     const char *pszPathIdx)
 {
     bool        fRet;
