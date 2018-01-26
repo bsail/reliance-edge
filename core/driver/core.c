@@ -28,6 +28,7 @@
 #include <redfs.h>
 #include <redcoreapi.h>
 #include <redcore.h>
+#include <subsystems/data/xmem.h>
 
 
 /*  Minimum number of blocks needed for metadata on any volume: the master
@@ -58,12 +59,29 @@ static REDSTATUS CoreFileTruncate(uint32_t ulInode, uint64_t ullSize);
 
 
 VOLUME gaRedVolume[REDCONF_VOLUME_COUNT];
-static COREVOLUME gaCoreVol[REDCONF_VOLUME_COUNT];
+// static COREVOLUME gaCoreVol[REDCONF_VOLUME_COUNT];
+
+#ifndef TEST
+static COREVOLUME *gaCoreVol = (COREVOLUME *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER_COREVOL);
+#else
+static COREVOLUME gaCoreVolHolder;
+static COREVOLUME *gaCoreVol = &gaCoreVolHolder;
+#endif
 
 const VOLCONF  * CONST_IF_ONE_VOLUME gpRedVolConf = &gaRedVolConf[0U];
 VOLUME         * CONST_IF_ONE_VOLUME gpRedVolume = &gaRedVolume[0U];
-COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol = &gaCoreVol[0U];
-METAROOT       *gpRedMR = &gaCoreVol[0U].aMR[0U];
+// COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol = &gaCoreVol[0U];
+// METAROOT       *gpRedMR = &gaCoreVol[0U].aMR[0U];
+
+// COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol;// = &gaCoreVol[0U];
+
+#ifndef TEST
+COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol=(COREVOLUME *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER_COREVOL);
+#else
+COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol = &gaCoreVolHolder;
+#endif
+
+METAROOT       *gpRedMR;// = &gaCoreVol[0U].aMR[0U];
 
 CONST_IF_ONE_VOLUME uint8_t gbRedVolNum;
 
@@ -83,6 +101,9 @@ CONST_IF_ONE_VOLUME uint8_t gbRedVolNum;
 */
 REDSTATUS RedCoreInit(void)
 {
+    // gpRedCoreVol = &gaCoreVol[0U];
+    gpRedMR = &gaCoreVol[0U].aMR[0U];
+
     REDSTATUS       ret = 0;
     uint8_t         bVolNum;
   #if REDCONF_OUTPUT == 1
