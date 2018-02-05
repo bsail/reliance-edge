@@ -30,17 +30,17 @@
 
 
 #if REDCONF_READ_ONLY == 0
-static REDSTATUS InodeIsBranched(uint32_t ulInode, bool *pfIsBranched);
+STATIC REDSTATUS InodeIsBranched(uint32_t ulInode, bool *pfIsBranched);
 #endif
 #if (REDCONF_READ_ONLY == 0) && (REDCONF_API_POSIX == 1)
-static REDSTATUS InodeFindFree(uint32_t *pulInode);
+STATIC REDSTATUS InodeFindFree(uint32_t *pulInode);
 #endif
 #if REDCONF_READ_ONLY == 0
-static REDSTATUS InodeGetWriteableCopy(uint32_t ulInode, uint8_t *pbWhich);
+STATIC REDSTATUS InodeGetWriteableCopy(uint32_t ulInode, uint8_t *pbWhich);
 #endif
-static REDSTATUS InodeGetCurrentCopy(uint32_t ulInode, uint8_t *pbWhich);
+STATIC REDSTATUS InodeGetCurrentCopy(uint32_t ulInode, uint8_t *pbWhich);
 #if REDCONF_READ_ONLY == 0
-static REDSTATUS InodeBitSet(uint32_t ulInode, uint8_t bWhich, bool fAllocated);
+STATIC REDSTATUS InodeBitSet(uint32_t ulInode, uint8_t bWhich, bool fAllocated);
 #endif
 static uint32_t InodeBlock(uint32_t ulInode, uint8_t bWhich);
 
@@ -664,7 +664,7 @@ void RedInodePutData(
                         number.
     @retval -RED_EIO    A disk I/O error occurred.
 */
-static REDSTATUS InodeIsBranched(
+STATIC REDSTATUS InodeIsBranched(
     uint32_t    ulInode,
     bool       *pfIsBranched)
 {
@@ -788,7 +788,7 @@ REDSTATUS RedInodeBranch(
     @retval -RED_EIO    A disk I/O error occurred.
     @retval -RED_ENFILE No available inode numbers.
 */
-static REDSTATUS InodeFindFree(
+STATIC REDSTATUS InodeFindFree(
     uint32_t   *pulInode)
 {
     REDSTATUS   ret;
@@ -904,7 +904,7 @@ REDSTATUS RedInodeIsFree(
                         number.
     @retval -RED_EIO    A disk I/O error occurred.
 */
-static REDSTATUS InodeGetWriteableCopy(
+STATIC REDSTATUS InodeGetWriteableCopy(
     uint32_t    ulInode,
     uint8_t    *pbWhich)
 {
@@ -974,7 +974,7 @@ static REDSTATUS InodeGetWriteableCopy(
                         number.
     @retval -RED_EIO    A disk I/O error occurred.
 */
-static REDSTATUS InodeGetCurrentCopy(
+STATIC REDSTATUS InodeGetCurrentCopy(
     uint32_t    ulInode,
     uint8_t    *pbWhich)
 {
@@ -1079,7 +1079,7 @@ REDSTATUS RedInodeBitGet(
                         not 1 or 0.
     @retval -RED_EIO    A disk I/O error occurred.
 */
-static REDSTATUS InodeBitSet(
+STATIC REDSTATUS InodeBitSet(
     uint32_t    ulInode,
     uint8_t     bWhich,
     bool        fAllocated)

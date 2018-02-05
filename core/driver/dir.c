@@ -72,7 +72,7 @@ typedef struct
 static REDSTATUS DirCyclicRenameCheck(uint32_t ulSrcInode, const CINODE *pDstPInode);
 #endif
 #if REDCONF_READ_ONLY == 0
-static REDSTATUS DirEntryWrite(CINODE *pPInode, uint32_t ulIdx, uint32_t ulInode, const char *pszName, uint32_t ulNameLen);
+STATIC REDSTATUS DirEntryWrite(CINODE *pPInode, uint32_t ulIdx, uint32_t ulInode, const char *pszName, uint32_t ulNameLen);
 static uint64_t DirEntryIndexToOffset(uint32_t ulIdx);
 #endif
 static uint32_t DirOffsetToEntryIndex(uint64_t ullOffset);
@@ -244,7 +244,7 @@ REDSTATUS RedDirEntryDelete(
                 ret = 0;
 
                 REDASSERT((ulTruncIdx % DIRENTS_PER_BLOCK) == 0U);
-                ulTruncIdx -= DIRENTS_PER_BLOCK;//LCOV_EXCL_STOP
+                ulTruncIdx -= DIRENTS_PER_BLOCK;//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
             else
             {
@@ -419,7 +419,7 @@ REDSTATUS RedDirEntryLookup(
                     }
 
                     ret = 0;
-                    ulIdx += DIRENTS_PER_BLOCK;//LCOV_EXCL_STOP
+                    ulIdx += DIRENTS_PER_BLOCK;//LCOV_EXCL_STOP LCOV_EXCL_LINE
                 }
                 else
                 {
@@ -886,7 +886,7 @@ static REDSTATUS DirCyclicRenameCheck(
     @retval -RED_ENOTDIR    @p pPInode is not a directory.
     @retval -RED_EINVAL     Invalid parameters.
 */
-static REDSTATUS DirEntryWrite(
+STATIC REDSTATUS DirEntryWrite(
     CINODE     *pPInode,
     uint32_t    ulIdx,
     uint32_t    ulInode,

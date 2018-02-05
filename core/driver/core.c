@@ -170,7 +170,7 @@ REDSTATUS RedCoreInit(void)
             pVol->bBlockSectorShift = 0U;
             while((pVolConf->ulSectorSize << pVol->bBlockSectorShift) < REDCONF_BLOCK_SIZE)
             {
-                pVol->bBlockSectorShift++;
+                pVol->bBlockSectorShift++;//LCOV_EXCL_LINE
             }
 
             /*  This should always be true since the block size is confirmed to
@@ -279,7 +279,7 @@ REDSTATUS RedCoreInit(void)
         if(abBytes[0U] != 0x00U)
       #endif
         {
-            ret = -RED_EINVAL;
+            ret = -RED_EINVAL;//LCOV_EXCL_LINE
         }
     }
 
@@ -541,7 +541,7 @@ REDSTATUS RedCoreVolStat(
         if(gpRedVolume->fReadOnly)
       #endif
         {
-            pStatFS->f_flag |= RED_ST_RDONLY;
+            pStatFS->f_flag |= RED_ST_RDONLY;//LCOV_EXCL_LINE
         }
 
         pStatFS->f_namemax = REDCONF_NAME_MAX;
@@ -705,14 +705,14 @@ REDSTATUS RedCoreCreate(
         ret = CoreCreate(ulPInode, pszName, fDir, pulInode);
 
         if(    (ret == -RED_ENOSPC)
-            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)
+            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)//LCOV_EXCL_START LCOV_EXCL_LINE
             && (gpRedCoreVol->ulAlmostFreeBlocks > 0U))
         {
             ret = RedVolTransact();
 
             if(ret == 0)
             {
-                ret = CoreCreate(ulPInode, pszName, fDir, pulInode);
+                ret = CoreCreate(ulPInode, pszName, fDir, pulInode);//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
         }
 
@@ -720,7 +720,7 @@ REDSTATUS RedCoreCreate(
         {
             if(fDir && ((gpRedVolume->ulTransMask & RED_TRANSACT_MKDIR) != 0U))
             {
-                ret = RedVolTransact();
+                ret = RedVolTransact();//LCOV_EXCL_LINE
             }
             else if(!fDir && ((gpRedVolume->ulTransMask & RED_TRANSACT_CREAT) != 0U))
             {
@@ -879,14 +879,14 @@ REDSTATUS RedCoreLink(
         ret = CoreLink(ulPInode, pszName, ulInode);
 
         if(    (ret == -RED_ENOSPC)
-            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)
+            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)//LCOV_EXCL_START LCOV_EXCL_LINE
             && (gpRedCoreVol->ulAlmostFreeBlocks > 0U))
         {
             ret = RedVolTransact();
 
             if(ret == 0)
             {
-                ret = CoreLink(ulPInode, pszName, ulInode);
+                ret = CoreLink(ulPInode, pszName, ulInode);//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
         }
 
@@ -1057,14 +1057,14 @@ REDSTATUS RedCoreUnlink(
         ret = CoreUnlink(ulPInode, pszName);
 
         if(    (ret == -RED_ENOSPC)
-            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)
+            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)//LCOV_EXCL_START LCOV_EXCL_LINE
             && (gpRedCoreVol->ulAlmostFreeBlocks > 0U))
         {
             ret = RedVolTransact();
 
             if(ret == 0)
             {
-                ret = CoreUnlink(ulPInode, pszName);
+                ret = CoreUnlink(ulPInode, pszName);//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
         }
 
@@ -1688,14 +1688,14 @@ REDSTATUS RedCoreFileWrite(
         ret = CoreFileWrite(ulInode, ullStart, pulLen, pBuffer);
 
         if(    (ret == -RED_ENOSPC)
-            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)
+            && ((gpRedVolume->ulTransMask & RED_TRANSACT_VOLFULL) != 0U)//LCOV_EXCL_START LCOV_EXCL_LINE
             && (gpRedCoreVol->ulAlmostFreeBlocks > 0U))
         {
             ret = RedVolTransact();
 
             if(ret == 0)
             {
-                ret = CoreFileWrite(ulInode, ullStart, pulLen, pBuffer);
+                ret = CoreFileWrite(ulInode, ullStart, pulLen, pBuffer);//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
         }
 

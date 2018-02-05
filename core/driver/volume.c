@@ -29,7 +29,7 @@
 #include <redcore.h>
 
 
-static bool MetarootIsValid(METAROOT *pMR, bool *pfSectorCRCIsValid);
+STATIC bool MetarootIsValid(METAROOT *pMR, bool *pfSectorCRCIsValid);
 #ifdef REDCONF_ENDIAN_SWAP
 static void MetaRootEndianSwap(METAROOT *pMetaRoot);
 #endif
@@ -281,7 +281,7 @@ REDSTATUS RedVolMountMetaroot(void)
     @retval true    The metaroot buffer is valid.
     @retval false   The metaroot buffer is invalid.
 */
-static bool MetarootIsValid(
+STATIC bool MetarootIsValid(
     METAROOT   *pMR,
     bool       *pfSectorCRCIsValid)
 {

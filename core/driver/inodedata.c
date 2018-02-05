@@ -55,28 +55,28 @@ typedef enum
 
 #if REDCONF_READ_ONLY == 0
 #if DELETE_SUPPORTED || TRUNCATE_SUPPORTED
-static REDSTATUS Shrink(CINODE *pInode, uint64_t ullSize);
+STATIC REDSTATUS Shrink(CINODE *pInode, uint64_t ullSize);
 #if DINDIR_POINTERS > 0U
-static REDSTATUS TruncDindir(CINODE *pInode, bool *pfFreed);
+STATIC REDSTATUS TruncDindir(CINODE *pInode, bool *pfFreed);
 #endif
 #if REDCONF_DIRECT_POINTERS < INODE_ENTRIES
-static REDSTATUS TruncIndir(CINODE *pInode, bool *pfFreed);
+STATIC REDSTATUS TruncIndir(CINODE *pInode, bool *pfFreed);
 #endif
-static REDSTATUS TruncDataBlock(const CINODE *pInode, uint32_t *pulBlock, bool fPropagate);
+STATIC REDSTATUS TruncDataBlock(const CINODE *pInode, uint32_t *pulBlock, bool fPropagate);
 #endif
 static REDSTATUS ExpandPrepare(CINODE *pInode);
 #endif
 static void SeekCoord(CINODE *pInode, uint32_t ulBlock);
-static REDSTATUS ReadUnaligned(CINODE *pInode, uint64_t ullStart, uint32_t ulLen, uint8_t *pbBuffer);
-static REDSTATUS ReadAligned(CINODE *pInode, uint32_t ulBlockStart, uint32_t ulBlockCount, uint8_t *pbBuffer);
+STATIC REDSTATUS ReadUnaligned(CINODE *pInode, uint64_t ullStart, uint32_t ulLen, uint8_t *pbBuffer);
+STATIC REDSTATUS ReadAligned(CINODE *pInode, uint32_t ulBlockStart, uint32_t ulBlockCount, uint8_t *pbBuffer);
 #if REDCONF_READ_ONLY == 0
-static REDSTATUS WriteUnaligned(CINODE *pInode, uint64_t ullStart, uint32_t ulLen, const uint8_t *pbBuffer);
-static REDSTATUS WriteAligned(CINODE *pInode, uint32_t ulBlockStart, uint32_t *pulBlockCount, const uint8_t *pbBuffer);
+STATIC REDSTATUS WriteUnaligned(CINODE *pInode, uint64_t ullStart, uint32_t ulLen, const uint8_t *pbBuffer);
+STATIC REDSTATUS WriteAligned(CINODE *pInode, uint32_t ulBlockStart, uint32_t *pulBlockCount, const uint8_t *pbBuffer);
 #endif
-static REDSTATUS GetExtent(CINODE *pInode, uint32_t ulBlockStart, uint32_t *pulExtentStart, uint32_t *pulExtentLen);
+STATIC REDSTATUS GetExtent(CINODE *pInode, uint32_t ulBlockStart, uint32_t *pulExtentStart, uint32_t *pulExtentLen);
 #if REDCONF_READ_ONLY == 0
 static REDSTATUS BranchBlock(CINODE *pInode, BRANCHDEPTH depth, bool fBuffer);
-static REDSTATUS BranchOneBlock(uint32_t *pulBlock, void **ppBuffer, uint16_t uBFlag);
+STATIC REDSTATUS BranchOneBlock(uint32_t *pulBlock, void **ppBuffer, uint16_t uBFlag);
 static REDSTATUS BranchBlockCost(const CINODE *pInode, BRANCHDEPTH depth, uint32_t *pulCost);
 static uint32_t FreeBlockCount(void);
 #endif
@@ -417,7 +417,7 @@ REDSTATUS RedInodeDataTruncate(
     @retval -RED_ENOSPC Insufficient free space to perform the truncate.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS Shrink(
+STATIC REDSTATUS Shrink(
     CINODE     *pInode,
     uint64_t    ullSize)
 {
@@ -533,7 +533,7 @@ static REDSTATUS Shrink(
     @retval -RED_ENOSPC Insufficient free space to perform the truncate.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS TruncDindir(
+STATIC REDSTATUS TruncDindir(
     CINODE     *pInode,
     bool       *pfFreed)
 {
@@ -568,7 +568,7 @@ static REDSTATUS TruncDindir(
             deleted, we know this indirect pointer is going away, and that might
             mean the double indirect is going to be deleted also.
         */
-        if(!fBranch && (pInode->pDindir->aulEntries[pInode->uDindirEntry] != BLOCK_SPARSE))
+        if(!fBranch && (pInode->pDindir->aulEntries[pInode->uDindirEntry] != BLOCK_SPARSE))//LCOV_EXCL_LINE
         {
             for(uEntry = 0U; !fBranch && (uEntry < pInode->uIndirEntry); uEntry++)//LCOV_EXCL_START
             {
@@ -640,7 +640,7 @@ static REDSTATUS TruncDindir(
                 {
                     RedInodePutDindir(pInode);
 
-                    ret = RedImapBlockSet(pInode->ulDindirBlock, false);//LCOV_EXCL_STOP
+                    ret = RedImapBlockSet(pInode->ulDindirBlock, false);//LCOV_EXCL_STOP LCOV_EXCL_LINE
                 }
             }
         }
@@ -666,7 +666,7 @@ static REDSTATUS TruncDindir(
     @retval -RED_ENOSPC Insufficient free space to perform the truncate.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS TruncIndir(
+STATIC REDSTATUS TruncIndir(
     CINODE     *pInode,
     bool       *pfFreed)
 {
@@ -745,7 +745,7 @@ static REDSTATUS TruncIndir(
     @retval -RED_EIO    A disk I/O error occurred.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS TruncDataBlock(
+STATIC REDSTATUS TruncDataBlock(
     const CINODE   *pInode,
     uint32_t       *pulBlock,
     bool            fPropagate)
@@ -943,7 +943,7 @@ REDSTATUS RedInodeDataSeek(
       #endif
 
       #if REDCONF_DIRECT_POINTERS < INODE_ENTRIES
-        if((ret == 0) && (pInode->uIndirEntry != COORD_ENTRY_INVALID))//LCOV_EXCL_STOP
+        if((ret == 0) && (pInode->uIndirEntry != COORD_ENTRY_INVALID))//LCOV_EXCL_STOP LCOV_EXCL_LINE
         {
             if(pInode->ulIndirBlock == BLOCK_SPARSE)
             {
@@ -1143,7 +1143,7 @@ static void SeekCoord(
     @retval -RED_EIO    A disk I/O error occurred.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS ReadUnaligned(
+STATIC REDSTATUS ReadUnaligned(
     CINODE     *pInode,
     uint64_t    ullStart,
     uint32_t    ulLen,
@@ -1198,7 +1198,7 @@ static REDSTATUS ReadUnaligned(
     @retval -RED_EIO    A disk I/O error occurred.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS ReadAligned(
+STATIC REDSTATUS ReadAligned(
     CINODE     *pInode,
     uint32_t    ulBlockStart,
     uint32_t    ulBlockCount,
@@ -1249,7 +1249,7 @@ static REDSTATUS ReadAligned(
                 */
                 RedMemSet(&pbBuffer[ulBlockIndex << BLOCK_SIZE_P2], 0U, REDCONF_BLOCK_SIZE);
                 ulBlockIndex++;
-                ret = 0;//LCOV_EXCL_STOP
+                ret = 0;//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
             else
             {
@@ -1279,7 +1279,7 @@ static REDSTATUS ReadAligned(
                         free space.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS WriteUnaligned(
+STATIC REDSTATUS WriteUnaligned(
     CINODE         *pInode,
     uint64_t        ullStart,
     uint32_t        ulLen,
@@ -1331,7 +1331,7 @@ static REDSTATUS WriteUnaligned(
                         free space.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS WriteAligned(
+STATIC REDSTATUS WriteAligned(
     CINODE         *pInode,
     uint32_t        ulBlockStart,
     uint32_t       *pulBlockCount,
@@ -1442,7 +1442,7 @@ static REDSTATUS WriteAligned(
     @retval -RED_ENODATA    The block offset is sparse.
     @retval -RED_EINVAL     Invalid parameters.
 */
-static REDSTATUS GetExtent(
+STATIC REDSTATUS GetExtent(
     CINODE     *pInode,
     uint32_t    ulBlockStart,
     uint32_t   *pulExtentStart,
@@ -1537,7 +1537,7 @@ static REDSTATUS BranchBlock(
                 */
                 pInode->pDindir->ulInode = pInode->ulInode;
 
-                pInode->pInodeBuf->aulEntries[pInode->uInodeEntry] = pInode->ulDindirBlock;//LCOV_EXCL_STOP
+                pInode->pInodeBuf->aulEntries[pInode->uInodeEntry] = pInode->ulDindirBlock;//LCOV_EXCL_STOP LCOV_EXCL_LINE
             }
         }
 
@@ -1646,7 +1646,7 @@ static REDSTATUS BranchBlock(
     @retval -RED_EIO    A disk I/O error occurred.
     @retval -RED_EINVAL Invalid parameters.
 */
-static REDSTATUS BranchOneBlock(
+STATIC REDSTATUS BranchOneBlock(
     uint32_t   *pulBlock,
     void      **ppBuffer,
     uint16_t    uBFlag)
@@ -1778,8 +1778,8 @@ static REDSTATUS BranchBlockCost(
 
     if(!CINODE_IS_MOUNTED(pInode) || !pInode->fCoordInited || (depth > BRANCHDEPTH_MAX) || (pulCost == NULL))
     {
-        REDERROR();
-        ret = -RED_EINVAL;
+        REDERROR();//LCOV_EXCL_LINE
+        ret = -RED_EINVAL;//LCOV_EXCL_LINE
     }
     else
     {
@@ -1808,7 +1808,7 @@ static REDSTATUS BranchBlockCost(
                 {
                     /*  Double indirect already branched.
                     */
-                    ulCost--;//LCOV_EXCL_STOP
+                    ulCost--;//LCOV_EXCL_STOP LCOV_EXCL_LINE
                 }
             }
         }

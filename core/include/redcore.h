@@ -252,6 +252,32 @@ REDSTATUS RedVolSeqNumIncrement(void);
 REDSTATUS RedVolFormat(void);
 #endif
 
+#include <config.h>
+
+#ifdef TEST
+bool MetarootIsValid(METAROOT *pMR, bool *pfSectorCRCIsValid);
+REDSTATUS Shrink(CINODE *pInode, uint64_t ullSize);
+REDSTATUS TruncDindir(CINODE *pInode, bool *pfFreed);
+REDSTATUS TruncIndir(CINODE *pInode, bool *pfFreed);
+REDSTATUS TruncDataBlock(const CINODE *pInode, uint32_t *pulBlock, bool fPropagate);
+REDSTATUS ReadUnaligned(CINODE *pInode, uint64_t ullStart, uint32_t ulLen, uint8_t *pbBuffer);
+REDSTATUS ReadAligned(CINODE *pInode, uint32_t ulBlockStart, uint32_t ulBlockCount, uint8_t *pbBuffer);
+REDSTATUS WriteUnaligned(CINODE *pInode, uint64_t ullStart, uint32_t ulLen, const uint8_t *pbBuffer);
+REDSTATUS WriteAligned(CINODE *pInode, uint32_t ulBlockStart, uint32_t *pulBlockCount, const uint8_t *pbBuffer);
+REDSTATUS GetExtent(CINODE *pInode, uint32_t ulBlockStart, uint32_t *pulExtentStart, uint32_t *pulExtentLen);
+REDSTATUS BranchOneBlock(uint32_t *pulBlock, void **ppBuffer, uint16_t uBFlag);
+REDSTATUS InodeIsBranched(uint32_t ulInode, bool *pfIsBranched);
+REDSTATUS InodeFindFree(uint32_t *pulInode);
+REDSTATUS InodeGetWriteableCopy(uint32_t ulInode, uint8_t *pbWhich);
+REDSTATUS InodeGetCurrentCopy(uint32_t ulInode, uint8_t *pbWhich);
+REDSTATUS InodeBitSet(uint32_t ulInode, uint8_t bWhich, bool fAllocated);
+REDSTATUS DirEntryWrite(CINODE *pPInode, uint32_t ulIdx, uint32_t ulInode, const char *pszName, uint32_t ulNameLen);
+bool BufferIsValid(const uint8_t  *pbBuffer, uint16_t uFlags);
+REDSTATUS BufferFinalize(uint8_t *pbBuffer, uint16_t uFlags);
+void BufferMakeLRU(uint8_t bIdx);
+void BufferMakeMRU(uint8_t bIdx);
+bool BufferFind(uint32_t ulBlock, uint8_t *pbIdx);
+#endif
 
 #endif
 

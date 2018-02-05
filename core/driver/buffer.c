@@ -148,15 +148,15 @@ typedef struct
 } BUFFERCTX;
 
 
-static bool BufferIsValid(const uint8_t  *pbBuffer, uint16_t uFlags);
+STATIC bool BufferIsValid(const uint8_t  *pbBuffer, uint16_t uFlags);
 static bool BufferToIdx(const void *pBuffer, uint8_t *pbIdx);
 #if REDCONF_READ_ONLY == 0
 static REDSTATUS BufferWrite(uint8_t bIdx);
-static REDSTATUS BufferFinalize(uint8_t *pbBuffer, uint16_t uFlags);
+STATIC REDSTATUS BufferFinalize(uint8_t *pbBuffer, uint16_t uFlags);
 #endif
-static void BufferMakeLRU(uint8_t bIdx);
-static void BufferMakeMRU(uint8_t bIdx);
-static bool BufferFind(uint32_t ulBlock, uint8_t *pbIdx);
+STATIC void BufferMakeLRU(uint8_t bIdx);
+STATIC void BufferMakeMRU(uint8_t bIdx);
+STATIC bool BufferFind(uint32_t ulBlock, uint8_t *pbIdx);
 
 #ifdef REDCONF_ENDIAN_SWAP
 static void BufferEndianSwap(const void *pBuffer, uint16_t uFlags);
@@ -633,7 +633,7 @@ REDSTATUS RedBufferDiscardRange(
     @retval true    The metadata buffer is valid.
     @retval false   The metadata buffer is invalid.
 */
-static bool BufferIsValid(
+STATIC bool BufferIsValid(
     const uint8_t  *pbBuffer,
     uint16_t        uFlags)
 {
@@ -836,7 +836,7 @@ static REDSTATUS BufferWrite(
     @retval 0           Operation was successful.
     @retval -RED_EINVAL Invalid parameter; or maximum sequence number reached.
 */
-static REDSTATUS BufferFinalize(
+STATIC REDSTATUS BufferFinalize(
     uint8_t    *pbBuffer,
     uint16_t    uFlags)
 {
@@ -1088,7 +1088,7 @@ static void BufferEndianSwapIndir(
 
     @param bIdx The index of the buffer to make LRU.
 */
-static void BufferMakeLRU(
+STATIC void BufferMakeLRU(
     uint8_t bIdx)
 {
     if(bIdx >= REDCONF_BUFFER_COUNT)
@@ -1136,7 +1136,7 @@ static void BufferMakeLRU(
 
     @param bIdx The index of the buffer to make MRU.
 */
-static void BufferMakeMRU(
+STATIC void BufferMakeMRU(
     uint8_t bIdx)
 {
     if(bIdx >= REDCONF_BUFFER_COUNT)
@@ -1192,7 +1192,7 @@ static void BufferMakeMRU(
                     @p pbIdx.
     @retval false   @p ulBlock is not buffered.
 */
-static bool BufferFind(
+STATIC bool BufferFind(
     uint32_t ulBlock,
     uint8_t *pbIdx)
 {
