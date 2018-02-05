@@ -208,6 +208,21 @@ char *red_getcwd(char *pszBuffer, uint32_t ulBufferSize);
 #endif
 REDSTATUS *red_errnoptr(void);
 
+#include <config.h>
+
+#ifdef TEST
+
+#include <redmisc.h>
+
+uint16_t gauGeneration[REDCONF_VOLUME_COUNT];
+REDHANDLE gaHandle[REDCONF_HANDLE_COUNT];
+REDSTATUS UnlinkSub(const char *pszPath, FTYPE type);
+REDSTATUS FildesToHandle(int32_t iFildes, FTYPE expectedType, REDHANDLE **ppHandle);
+int32_t FildesPack(uint16_t uHandleIdx, uint8_t bVolNum);
+bool DirStreamIsValid(const REDDIR *pDirStream);
+REDSTATUS FildesOpen(const char *pszPath, uint32_t ulOpenMode, FTYPE type, int32_t *piFildes);
+#endif
+
 #endif /* REDCONF_API_POSIX */
 
 

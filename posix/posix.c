@@ -133,16 +133,16 @@ typedef struct
 -------------------------------------------------------------------*/
 
 #if (REDCONF_READ_ONLY == 0) && ((REDCONF_API_POSIX_UNLINK == 1) || (REDCONF_API_POSIX_RMDIR == 1))
-static REDSTATUS UnlinkSub(const char *pszPath, FTYPE type);
+STATIC REDSTATUS UnlinkSub(const char *pszPath, FTYPE type);
 #endif
 static REDSTATUS PathStartingPoint(const char *pszPath, uint8_t *pbVolNum, uint32_t *pulCwdInode, const char **ppszLocalPath);
-static REDSTATUS FildesOpen(const char *pszPath, uint32_t ulOpenMode, FTYPE type, int32_t *piFildes);
+STATIC REDSTATUS FildesOpen(const char *pszPath, uint32_t ulOpenMode, FTYPE type, int32_t *piFildes);
 static REDSTATUS FildesClose(int32_t iFildes);
-static REDSTATUS FildesToHandle(int32_t iFildes, FTYPE expectedType, REDHANDLE **ppHandle);
-static int32_t FildesPack(uint16_t uHandleIdx, uint8_t bVolNum);
+STATIC REDSTATUS FildesToHandle(int32_t iFildes, FTYPE expectedType, REDHANDLE **ppHandle);
+STATIC int32_t FildesPack(uint16_t uHandleIdx, uint8_t bVolNum);
 static void FildesUnpack(int32_t iFildes, uint16_t *puHandleIdx, uint8_t *pbVolNum, uint16_t *puGeneration);
 #if REDCONF_API_POSIX_READDIR == 1
-static bool DirStreamIsValid(const REDDIR *pDirStream);
+STATIC bool DirStreamIsValid(const REDDIR *pDirStream);
 #endif
 static REDSTATUS PosixEnter(void);
 static void PosixLeave(void);
@@ -165,7 +165,7 @@ static int32_t PosixReturn(REDSTATUS iError);
 -------------------------------------------------------------------*/
 
 static bool gfPosixInited;                              /* Whether driver is initialized. */
-static REDHANDLE gaHandle[REDCONF_HANDLE_COUNT];        /* Array of all handles. */
+STATIC REDHANDLE gaHandle[REDCONF_HANDLE_COUNT];        /* Array of all handles. */
 #if REDCONF_TASK_COUNT > 1U
 static TASKSLOT gaTask[REDCONF_TASK_COUNT];             /* Array of task slots. */
 #endif
@@ -179,7 +179,7 @@ static WORKDIR gCwd;                                    /* Current working direc
     descriptor from a previous mount can be detected since it will include a
     stale generation number.
 */
-static uint16_t gauGeneration[REDCONF_VOLUME_COUNT];
+STATIC uint16_t gauGeneration[REDCONF_VOLUME_COUNT];
 
 
 /*-------------------------------------------------------------------
@@ -2564,7 +2564,7 @@ REDSTATUS *red_errnoptr(void)
                                 modify the parent directory to perform the
                                 deletion.
 */
-static REDSTATUS UnlinkSub(
+STATIC REDSTATUS UnlinkSub(
     const char *pszPath,
     FTYPE       type)
 {
@@ -2751,7 +2751,7 @@ static REDSTATUS PathStartingPoint(
     @retval -RED_EROFS          The path resides on a read-only file system and
                                 a write operation was requested.
 */
-static REDSTATUS FildesOpen(
+STATIC REDSTATUS FildesOpen(
     const char *pszPath,
     uint32_t    ulOpenMode,
     FTYPE       type,
@@ -2916,8 +2916,8 @@ static REDSTATUS FildesOpen(
                         /*  It should be impossible to get here, unless there
                             is memory corruption.
                         */
-                        REDERROR();
-                        ret = -RED_EFUBAR;
+                        REDERROR();//LCOV_EXCL_LINE
+                        ret = -RED_EFUBAR;//LCOV_EXCL_LINE
                     }
                     else
                     {
@@ -3005,7 +3005,7 @@ static REDSTATUS FildesClose(
     @retval -RED_ENOTDIR    Expected a directory, but the file descriptor is for
                             a file.
 */
-static REDSTATUS FildesToHandle(
+STATIC REDSTATUS FildesToHandle(
     int32_t     iFildes,
     FTYPE       expectedType,
     REDHANDLE **ppHandle)
@@ -3065,7 +3065,7 @@ static REDSTATUS FildesToHandle(
 
     @return The packed file descriptor.
 */
-static int32_t FildesPack(
+STATIC int32_t FildesPack(
     uint16_t    uHandleIdx,
     uint8_t     bVolNum)
 {
@@ -3153,7 +3153,7 @@ static void FildesUnpack(
     @retval true    The directory stream object appears valid.
     @retval false   The directory stream object is invalid.
 */
-static bool DirStreamIsValid(
+STATIC bool DirStreamIsValid(
     const REDDIR   *pDirStream)
 {
     bool            fRet = true;
