@@ -239,12 +239,12 @@ REDSTATUS RedDirEntryDelete(
                     ulBlockIdx--;
                 } while(ulBlockIdx != UINT32_MAX);
             }
-            else if(ret == -RED_ENODATA)
+            else if(ret == -RED_ENODATA)//LCOV_EXCL_START
             {
                 ret = 0;
 
                 REDASSERT((ulTruncIdx % DIRENTS_PER_BLOCK) == 0U);
-                ulTruncIdx -= DIRENTS_PER_BLOCK;
+                ulTruncIdx -= DIRENTS_PER_BLOCK;//LCOV_EXCL_STOP
             }
             else
             {
@@ -411,7 +411,7 @@ REDSTATUS RedDirEntryLookup(
 
                     ulIdx += ulBlockLastIdx;
                 }
-                else if(ret == -RED_ENODATA)
+                else if(ret == -RED_ENODATA)//LCOV_EXCL_START
                 {
                     if(ulFreeIdx == DIR_INDEX_INVALID)
                     {
@@ -419,7 +419,7 @@ REDSTATUS RedDirEntryLookup(
                     }
 
                     ret = 0;
-                    ulIdx += DIRENTS_PER_BLOCK;
+                    ulIdx += DIRENTS_PER_BLOCK;//LCOV_EXCL_STOP
                 }
                 else
                 {
@@ -544,7 +544,7 @@ REDSTATUS RedDirEntryRead(
                         break;
                     }
 
-                    ulIdx++;
+                    ulIdx++;//LCOV_EXCL_LINE
                 }
 
                 if(ulBlockIdx < ulBlockLastIdx)
@@ -553,10 +553,10 @@ REDSTATUS RedDirEntryRead(
                     break;
                 }
             }
-            else if(ret == -RED_ENODATA)
+            else if(ret == -RED_ENODATA)//LCOV_EXCL_LINE
             {
-                ulIdx += DIRENTS_PER_BLOCK - (ulIdx % DIRENTS_PER_BLOCK);
-                ret = 0;
+                ulIdx += DIRENTS_PER_BLOCK - (ulIdx % DIRENTS_PER_BLOCK);//LCOV_EXCL_LINE
+                ret = 0;//LCOV_EXCL_LINE
             }
             else
             {
@@ -564,7 +564,7 @@ REDSTATUS RedDirEntryRead(
                 */
             }
 
-            REDASSERT(ulIdx <= ulDirentCount);
+            REDASSERT(ulIdx <= ulDirentCount);//LCOV_EXCL_LINE
         }
 
         if((ret == 0) && (ulIdx >= ulDirentCount))

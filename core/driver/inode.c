@@ -127,7 +127,7 @@ REDSTATUS RedInodeMount(
 
                 if(type == FTYPE_DIR)
                 {
-                    ret = -RED_ENOTDIR;
+                    ret = -RED_ENOTDIR;//LCOV_EXCL_LINE
                 }
               #endif
             }
@@ -138,7 +138,7 @@ REDSTATUS RedInodeMount(
 
                 if(type == FTYPE_FILE)
                 {
-                    ret = -RED_EISDIR;
+                    ret = -RED_EISDIR;//LCOV_EXCL_LINE
                 }
             }
           #endif
@@ -146,8 +146,8 @@ REDSTATUS RedInodeMount(
             {
                 /*  Missing or unsupported inode type.
                 */
-                CRITICAL_ERROR();
-                ret = -RED_EFUBAR;
+                CRITICAL_ERROR();//LCOV_EXCL_LINE
+                ret = -RED_EFUBAR;//LCOV_EXCL_LINE
             }
         }
 
@@ -160,7 +160,7 @@ REDSTATUS RedInodeMount(
 
         if(ret != 0)
         {
-            RedInodePut(pInode, 0U);
+            RedInodePut(pInode, 0U);//LCOV_EXCL_LINE
         }
     }
 
@@ -272,7 +272,7 @@ REDSTATUS RedInodeCreate(
 
                     if(ret != 0)
                     {
-                        RedBufferPut(pInode->pInodeBuf);
+                        RedBufferPut(pInode->pInodeBuf);//LCOV_EXCL_LINE
                     }
                 }
             }
@@ -440,8 +440,8 @@ REDSTATUS RedInodeFree(
                         /*  Both inode slots should never be allocated at
                             the same time.
                         */
-                        CRITICAL_ERROR();
-                        ret = -RED_EFUBAR;
+                        CRITICAL_ERROR();//LCOV_EXCL_LINE
+                        ret = -RED_EFUBAR;//LCOV_EXCL_LINE
                     }
                     else
                     {
@@ -455,8 +455,8 @@ REDSTATUS RedInodeFree(
                         /*  The inode in unallocated, which should have been
                             caught when it was mounted.
                         */
-                        CRITICAL_ERROR();
-                        ret = -RED_EBADF;
+                        CRITICAL_ERROR();//LCOV_EXCL_LINE
+                        ret = -RED_EBADF;//LCOV_EXCL_LINE
                     }
                     else
                     {
@@ -472,8 +472,8 @@ REDSTATUS RedInodeFree(
         {
             if(gpRedMR->ulFreeInodes >= gpRedVolConf->ulInodeCount)
             {
-                CRITICAL_ERROR();
-                ret = -RED_EFUBAR;
+                CRITICAL_ERROR();//LCOV_EXCL_LINE
+                ret = -RED_EFUBAR;//LCOV_EXCL_LINE
             }
             else
             {
@@ -588,8 +588,8 @@ void RedInodePutDindir(
     }
     else if(pInode->pDindir != NULL)
     {
-        RedBufferPut(pInode->pDindir);
-        pInode->pDindir = NULL;
+        RedBufferPut(pInode->pDindir);//LCOV_EXCL_LINE
+        pInode->pDindir = NULL;//LCOV_EXCL_LINE
     }
     else
     {
@@ -695,7 +695,7 @@ static REDSTATUS InodeIsBranched(
                 {
                     if(state == ALLOCSTATE_NEW)
                     {
-                        *pfIsBranched = true;
+                        *pfIsBranched = true;//LCOV_EXCL_LINE
                     }
                     else
                     {
@@ -732,8 +732,8 @@ REDSTATUS RedInodeBranch(
 
     if(!CINODE_IS_MOUNTED(pInode))
     {
-        REDERROR();
-        ret = -RED_EINVAL;
+        REDERROR();//LCOV_EXCL_LINE
+        ret = -RED_EINVAL;//LCOV_EXCL_LINE
     }
     else if(!pInode->fBranched)
     {
@@ -766,9 +766,9 @@ REDSTATUS RedInodeBranch(
     }
     else
     {
-        RedBufferDirty(pInode->pInodeBuf);
-        pInode->fDirty = true;
-        ret = 0;
+        RedBufferDirty(pInode->pInodeBuf);//LCOV_EXCL_LINE
+        pInode->fDirty = true;//LCOV_EXCL_LINE
+        ret = 0;//LCOV_EXCL_LINE
     }
 
     return ret;
@@ -830,8 +830,8 @@ static REDSTATUS InodeFindFree(
             {
                 /*  If gpRedMR->ulFreeInodes > 0, we should have found an inode.
                 */
-                CRITICAL_ERROR();
-                ret = -RED_ENFILE;
+                CRITICAL_ERROR();//LCOV_EXCL_LINE
+                ret = -RED_ENFILE;//LCOV_EXCL_LINE
             }
         }
     }
@@ -947,8 +947,8 @@ static REDSTATUS InodeGetWriteableCopy(
                         /*  Both inode slots were allocated, which should never
                             happen.
                         */
-                        CRITICAL_ERROR();
-                        ret = -RED_EFUBAR;
+                        CRITICAL_ERROR();//LCOV_EXCL_LINE
+                        ret = -RED_EFUBAR;//LCOV_EXCL_LINE
                     }
                 }
             }

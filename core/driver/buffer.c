@@ -242,8 +242,8 @@ REDSTATUS RedBufferGet(
             if(    ((uFlags & BFLAG_NEW) != 0U)
                 || ((uFlags & BFLAG_META_MASK) != (gBufCtx->aHead[bIdx].uFlags & BFLAG_META_MASK)))
             {
-                CRITICAL_ERROR();
-                ret = -RED_EFUBAR;
+                CRITICAL_ERROR();//LCOV_EXCL_LINE
+                ret = -RED_EFUBAR;//LCOV_EXCL_LINE
             }
         }
         else if(gBufCtx->uNumUsed == REDCONF_BUFFER_COUNT)
@@ -251,8 +251,8 @@ REDSTATUS RedBufferGet(
             /*  The MINIMUM_BUFFER_COUNT is supposed to ensure that no operation
                 ever runs out of buffers, so this should never happen.
             */
-            CRITICAL_ERROR();
-            ret = -RED_EBUSY;
+            CRITICAL_ERROR();//LCOV_EXCL_LINE
+            ret = -RED_EBUSY;//LCOV_EXCL_LINE
         }
         else
         {
@@ -283,7 +283,7 @@ REDSTATUS RedBufferGet(
                     CRITICAL_ERROR();
                     ret = -RED_EFUBAR;
                   #else
-                    ret = BufferWrite(bIdx);
+                    ret = BufferWrite(bIdx);//LCOV_EXCL_LINE
                   #endif
                 }
             }
@@ -292,11 +292,11 @@ REDSTATUS RedBufferGet(
                 /*  All the buffers are used, which should have been caught by
                     checking gBufCtx->uNumUsed.
                 */
-                CRITICAL_ERROR();
-                ret = -RED_EBUSY;
+                CRITICAL_ERROR();//LCOV_EXCL_LINE
+                ret = -RED_EBUSY;//LCOV_EXCL_LINE
             }
 
-            if(ret == 0)
+            if(ret == 0)//LCOV_EXCL_LINE
             {
                 if((uFlags & BFLAG_NEW) == 0U)
                 {
@@ -323,7 +323,7 @@ REDSTATUS RedBufferGet(
                                 mounted; that condition is expected and should
                                 not result in an assertion.
                             */
-                            CRITICAL_ASSERT((uFlags & BFLAG_META_MASTER) == BFLAG_META_MASTER);
+                            CRITICAL_ASSERT((uFlags & BFLAG_META_MASTER) == BFLAG_META_MASTER);//LCOV_EXCL_LINE
                             ret = -RED_EIO;
                         }
                     }
@@ -608,9 +608,9 @@ REDSTATUS RedBufferDiscardRange(
                            code should never reference buffers for these blocks,
                            since they would not be needed or used.
                     */
-                    CRITICAL_ERROR();
-                    ret = -RED_EBUSY;
-                    break;
+                    CRITICAL_ERROR();//LCOV_EXCL_LINE
+                    ret = -RED_EBUSY;//LCOV_EXCL_LINE
+                    break;//LCOV_EXCL_LINE
                 }
             }
         }
@@ -679,9 +679,9 @@ static bool BufferIsValid(
                 fValid = (uMetaFlags == BFLAG_META_INODE);
                 break;
           #if DINDIR_POINTERS > 0U
-            case META_SIG_DINDIR:
-                fValid = (uMetaFlags == BFLAG_META_DINDIR);
-                break;
+            case META_SIG_DINDIR://LCOV_EXCL_LINE
+                fValid = (uMetaFlags == BFLAG_META_DINDIR);//LCOV_EXCL_LINE
+                break;//LCOV_EXCL_LINE
           #endif
           #if REDCONF_DIRECT_POINTERS < INODE_ENTRIES
             case META_SIG_INDIR:
@@ -713,7 +713,7 @@ static bool BufferIsValid(
             }
             else if(gpRedVolume->fMounted && (buf.ullSequence >= gpRedVolume->ullSequence))
             {
-                fValid = false;
+                fValid = false;//LCOV_EXCL_LINE
             }
             else
             {
@@ -814,8 +814,8 @@ static REDSTATUS BufferWrite(
     }
     else
     {
-        REDERROR();
-        ret = -RED_EINVAL;
+        REDERROR();//LCOV_EXCL_LINE
+        ret = -RED_EINVAL;//LCOV_EXCL_LINE
     }
 
     return ret;
@@ -865,24 +865,24 @@ static REDSTATUS BufferFinalize(
                 ulSignature = META_SIG_INODE;
                 break;
           #if DINDIR_POINTERS > 0U
-            case BFLAG_META_DINDIR:
-                ulSignature = META_SIG_DINDIR;
-                break;
+            case BFLAG_META_DINDIR://LCOV_EXCL_LINE
+                ulSignature = META_SIG_DINDIR;//LCOV_EXCL_LINE
+                break;//LCOV_EXCL_LINE
           #endif
           #if REDCONF_DIRECT_POINTERS < INODE_ENTRIES
             case BFLAG_META_INDIR:
                 ulSignature = META_SIG_INDIR;
                 break;
           #endif
-            default:
-                ulSignature = 0U;
-                break;
+            default://LCOV_EXCL_LINE
+                ulSignature = 0U;//LCOV_EXCL_LINE
+                break;//LCOV_EXCL_LINE
         }
 
         if(ulSignature == 0U)
         {
-            REDERROR();
-            ret = -RED_EINVAL;
+            REDERROR();//LCOV_EXCL_LINE
+            ret = -RED_EINVAL;//LCOV_EXCL_LINE
         }
         else
         {
@@ -1121,7 +1121,7 @@ static void BufferMakeLRU(
         }
         else
         {
-            REDERROR();
+            REDERROR();//LCOV_EXCL_LINE
         }
     }
     else
@@ -1169,7 +1169,7 @@ static void BufferMakeMRU(
         }
         else
         {
-            REDERROR();
+            REDERROR();//LCOV_EXCL_LINE
         }
     }
     else

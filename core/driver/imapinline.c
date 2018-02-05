@@ -97,8 +97,8 @@ REDSTATUS RedImapIBlockSet(
         || (ulBlock < gpRedCoreVol->ulInodeTableStartBN)
         || (ulBlock >= gpRedVolume->ulBlockCount))
     {
-        REDERROR();
-        ret = -RED_EINVAL;
+        REDERROR();//LCOV_EXCL_LINE
+        ret = -RED_EINVAL;//LCOV_EXCL_LINE
     }
     else
     {
@@ -110,8 +110,8 @@ REDSTATUS RedImapIBlockSet(
                 value.  This is more of a problem with the external imap, but it
                 is checked here for consistency.
             */
-            CRITICAL_ERROR();
-            ret = -RED_EFUBAR;
+            CRITICAL_ERROR();//LCOV_EXCL_LINE
+            ret = -RED_EFUBAR;//LCOV_EXCL_LINE
         }
         else if(fAllocated)
         {

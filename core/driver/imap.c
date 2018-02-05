@@ -112,8 +112,8 @@ REDSTATUS RedImapBlockSet(
     if(    (ulBlock < gpRedCoreVol->ulInodeTableStartBN)
         || (ulBlock >= gpRedVolume->ulBlockCount))
     {
-        REDERROR();
-        ret = -RED_EINVAL;
+        REDERROR();//LCOV_EXCL_LINE
+        ret = -RED_EINVAL;//LCOV_EXCL_LINE
     }
     else if(    (ulBlock >= gpRedCoreVol->ulFirstAllocableBN)
              && (    (fAllocated && (gpRedMR->ulFreeBlocks == 0U))
@@ -123,8 +123,8 @@ REDSTATUS RedImapBlockSet(
             allocate a block when there are none available.  This could indicate
             metadata corruption.
         */
-        CRITICAL_ERROR();
-        ret = -RED_EFUBAR;
+        CRITICAL_ERROR();//LCOV_EXCL_LINE
+        ret = -RED_EFUBAR;//LCOV_EXCL_LINE
     }
     else
     {
@@ -185,7 +185,7 @@ REDSTATUS RedImapBlockSet(
                 }
                 else
                 {
-                    gpRedMR->ulFreeBlocks++;
+                    gpRedMR->ulFreeBlocks++;//LCOV_EXCL_LINE
                 }
             }
         }
@@ -250,7 +250,7 @@ REDSTATUS RedImapAllocBlock(
                 gpRedMR->ulAllocNextBlock++;
                 if(gpRedMR->ulAllocNextBlock == gpRedVolume->ulBlockCount)
                 {
-                    gpRedMR->ulAllocNextBlock = gpRedCoreVol->ulFirstAllocableBN;
+                    gpRedMR->ulAllocNextBlock = gpRedCoreVol->ulFirstAllocableBN;//LCOV_EXCL_LINE
                 }
             }
         }
@@ -262,8 +262,8 @@ REDSTATUS RedImapAllocBlock(
                 error occurred while looking for free blocks, but no free blocks
                 were found.  This indicates metadata corruption.
             */
-            CRITICAL_ERROR();
-            ret = -RED_EFUBAR;
+            CRITICAL_ERROR();//LCOV_EXCL_LINE
+            ret = -RED_EFUBAR;//LCOV_EXCL_LINE
         }
     }
 
@@ -333,7 +333,7 @@ REDSTATUS RedImapBlockState(
                 {
                     if(fBitOld)
                     {
-                        *pState = ALLOCSTATE_AFREE;
+                        *pState = ALLOCSTATE_AFREE;//LCOV_EXCL_LINE
                     }
                     else
                     {

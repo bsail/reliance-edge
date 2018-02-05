@@ -245,7 +245,7 @@ REDSTATUS RedInodeDataWrite(
 
         if((INODE_SIZE_MAX - ullStart) < ulLen)
         {
-            ulLen = (uint32_t)(INODE_SIZE_MAX - ullStart);
+            ulLen = (uint32_t)(INODE_SIZE_MAX - ullStart);//LCOV_EXCL_LINE
         }
 
         ulRemaining = ulLen;
@@ -289,8 +289,8 @@ REDSTATUS RedInodeDataWrite(
 
             if((ret == -RED_ENOSPC) && (ulWriteIndex > 0U))
             {
-                ulBlocksWritten = 0U;
-                ret = 0;
+                ulBlocksWritten = 0U;//LCOV_EXCL_LINE
+                ret = 0;//LCOV_EXCL_LINE
             }
 
             if(ret == 0)
@@ -300,7 +300,7 @@ REDSTATUS RedInodeDataWrite(
 
                 if(ulBlocksWritten < ulBlockCount)
                 {
-                    ulRemaining = 0U;
+                    ulRemaining = 0U;//LCOV_EXCL_LINE
                 }
             }
         }
@@ -383,7 +383,7 @@ REDSTATUS RedInodeDataTruncate(
     {
         if(ullSize > pInode->pInodeBuf->ullSize)
         {
-            ret = ExpandPrepare(pInode);
+            ret = ExpandPrepare(pInode);//LCOV_EXCL_LINE
         }
         else if(ullSize < pInode->pInodeBuf->ullSize)
         {
@@ -501,7 +501,7 @@ static REDSTATUS Shrink(
                 {
                     if(fFreed)
                     {
-                        pInode->pInodeBuf->aulEntries[uOrigInodeEntry] = BLOCK_SPARSE;
+                        pInode->pInodeBuf->aulEntries[uOrigInodeEntry] = BLOCK_SPARSE;//LCOV_EXCL_LINE
                     }
 
                     /*  The next seek will go to the beginning of the next
@@ -557,9 +557,9 @@ static REDSTATUS TruncDindir(
             deleted) if any of its indirect pointers which are entirely prior to
             the truncation boundary are non-sparse.
         */
-        for(uEntry = 0U; !fBranch && (uEntry < pInode->uDindirEntry); uEntry++)
+        for(uEntry = 0U; !fBranch && (uEntry < pInode->uDindirEntry); uEntry++)//LCOV_EXCL_LINE
         {
-            fBranch = pInode->pDindir->aulEntries[uEntry] != BLOCK_SPARSE;
+            fBranch = pInode->pDindir->aulEntries[uEntry] != BLOCK_SPARSE;//LCOV_EXCL_LINE
         }
 
         /*  Unless we already know for a fact that the double indirect is going
@@ -570,7 +570,7 @@ static REDSTATUS TruncDindir(
         */
         if(!fBranch && (pInode->pDindir->aulEntries[pInode->uDindirEntry] != BLOCK_SPARSE))
         {
-            for(uEntry = 0U; !fBranch && (uEntry < pInode->uIndirEntry); uEntry++)
+            for(uEntry = 0U; !fBranch && (uEntry < pInode->uIndirEntry); uEntry++)//LCOV_EXCL_START
             {
                 fBranch = pInode->pIndir->aulEntries[uEntry] != BLOCK_SPARSE;
             }
@@ -640,7 +640,7 @@ static REDSTATUS TruncDindir(
                 {
                     RedInodePutDindir(pInode);
 
-                    ret = RedImapBlockSet(pInode->ulDindirBlock, false);
+                    ret = RedImapBlockSet(pInode->ulDindirBlock, false);//LCOV_EXCL_STOP
                 }
             }
         }
@@ -690,17 +690,17 @@ static REDSTATUS TruncIndir(
             is anything there, then the indirect will not be empty after the
             truncate, so it is branched and modified instead of deleted.
         */
-        for(uEntry = 0U; !fBranch && (uEntry < pInode->uIndirEntry); uEntry++)
+        for(uEntry = 0U; !fBranch && (uEntry < pInode->uIndirEntry); uEntry++)//LCOV_EXCL_LINE
         {
-            fBranch = pInode->pIndir->aulEntries[uEntry] != BLOCK_SPARSE;
+            fBranch = pInode->pIndir->aulEntries[uEntry] != BLOCK_SPARSE;//LCOV_EXCL_LINE
         }
 
         if(fBranch)
         {
-            ret = BranchBlock(pInode, BRANCHDEPTH_INDIR, false);
+            ret = BranchBlock(pInode, BRANCHDEPTH_INDIR, false);//LCOV_EXCL_LINE
         }
 
-        if(ret == 0)
+        if(ret == 0)//LCOV_EXCL_LINE
         {
             for(uEntry = pInode->uIndirEntry; uEntry < INDIR_ENTRIES; uEntry++)
             {
@@ -766,8 +766,8 @@ static REDSTATUS TruncDataBlock(
         {
             if(pInode->pInodeBuf->ulBlocks == 0U)
             {
-                CRITICAL_ERROR();
-                ret = -RED_EFUBAR;
+                CRITICAL_ERROR();//LCOV_EXCL_LINE
+                ret = -RED_EFUBAR;//LCOV_EXCL_LINE
             }
             else
             {
@@ -816,8 +816,8 @@ static REDSTATUS ExpandPrepare(
 
     if(!CINODE_IS_DIRTY(pInode))
     {
-        REDERROR();
-        ret = -RED_EINVAL;
+        REDERROR();//LCOV_EXCL_LINE
+        ret = -RED_EINVAL;//LCOV_EXCL_LINE
     }
     else
     {
@@ -842,7 +842,7 @@ static REDSTATUS ExpandPrepare(
             }
             else
             {
-                REDERROR();
+                REDERROR();//LCOV_EXCL_LINE
             }
         }
     }
@@ -929,7 +929,7 @@ REDSTATUS RedInodeDataSeek(
             }
             else
             {
-                if(pInode->pDindir == NULL)
+                if(pInode->pDindir == NULL)//LCOV_EXCL_START
                 {
                     ret = RedBufferGet(pInode->ulDindirBlock, BFLAG_META_DINDIR, CAST_VOID_PTR_PTR(&pInode->pDindir));
                 }
@@ -943,7 +943,7 @@ REDSTATUS RedInodeDataSeek(
       #endif
 
       #if REDCONF_DIRECT_POINTERS < INODE_ENTRIES
-        if((ret == 0) && (pInode->uIndirEntry != COORD_ENTRY_INVALID))
+        if((ret == 0) && (pInode->uIndirEntry != COORD_ENTRY_INVALID))//LCOV_EXCL_STOP
         {
             if(pInode->ulIndirBlock == BLOCK_SPARSE)
             {
@@ -990,7 +990,7 @@ static void SeekCoord(
 {
     if(!CINODE_IS_MOUNTED(pInode) || (ulBlock >= INODE_DATA_BLOCKS))
     {
-        REDERROR();
+        REDERROR();//LCOV_EXCL_LINE
     }
     else if((pInode->ulLogicalBlock != ulBlock) || !pInode->fCoordInited)
     {
@@ -1088,9 +1088,9 @@ static void SeekCoord(
                 Otherwise, it old indirect will be released and the new one will
                 be read later.
             */
-            else if(pInode->uDindirEntry != uDindirEntry)
+            else if(pInode->uDindirEntry != uDindirEntry)//LCOV_EXCL_LINE
             {
-                RedInodePutIndir(pInode);
+                RedInodePutIndir(pInode);//LCOV_EXCL_LINE
             }
             else
             {
@@ -1167,12 +1167,12 @@ static REDSTATUS ReadUnaligned(
         {
             RedMemCpy(pbBuffer, &pInode->pbData[ullStart & (REDCONF_BLOCK_SIZE - 1U)], ulLen);
         }
-        else if(ret == -RED_ENODATA)
+        else if(ret == -RED_ENODATA)//LCOV_EXCL_LINE
         {
             /*  Sparse block, return zeroed data.
             */
-            RedMemSet(pbBuffer, 0U, ulLen);
-            ret = 0;
+            RedMemSet(pbBuffer, 0U, ulLen);//LCOV_EXCL_LINE
+            ret = 0;//LCOV_EXCL_LINE
         }
         else
         {
@@ -1243,13 +1243,13 @@ static REDSTATUS ReadAligned(
                     }
                 }
             }
-            else if(ret == -RED_ENODATA)
+            else if(ret == -RED_ENODATA)//LCOV_EXCL_START
             {
                 /*  Sparse block, return zeroed data.
                 */
                 RedMemSet(&pbBuffer[ulBlockIndex << BLOCK_SIZE_P2], 0U, REDCONF_BLOCK_SIZE);
                 ulBlockIndex++;
-                ret = 0;
+                ret = 0;//LCOV_EXCL_STOP
             }
             else
             {
@@ -1362,7 +1362,7 @@ static REDSTATUS WriteAligned(
 
                 if(ret == -RED_ENOSPC)
                 {
-                    if(ulBlockIndex > 0U)
+                    if(ulBlockIndex > 0U)//LCOV_EXCL_LINE
                     {
                         ret = 0;
                     }
@@ -1382,7 +1382,7 @@ static REDSTATUS WriteAligned(
 
         if(fFull)
         {
-            ulBlockCount--;
+            ulBlockCount--;//LCOV_EXCL_LINE
         }
 
         /*  Write the data to disk one contiguous extent at a time.
@@ -1529,7 +1529,7 @@ static REDSTATUS BranchBlock(
       #if DINDIR_POINTERS > 0U
         if(pInode->uDindirEntry != COORD_ENTRY_INVALID)
         {
-            ret = BranchOneBlock(&pInode->ulDindirBlock, CAST_VOID_PTR_PTR(&pInode->pDindir), BFLAG_META_DINDIR);
+            ret = BranchOneBlock(&pInode->ulDindirBlock, CAST_VOID_PTR_PTR(&pInode->pDindir), BFLAG_META_DINDIR);//LCOV_EXCL_START
 
             if(ret == 0)
             {
@@ -1537,7 +1537,7 @@ static REDSTATUS BranchBlock(
                 */
                 pInode->pDindir->ulInode = pInode->ulInode;
 
-                pInode->pInodeBuf->aulEntries[pInode->uInodeEntry] = pInode->ulDindirBlock;
+                pInode->pInodeBuf->aulEntries[pInode->uInodeEntry] = pInode->ulDindirBlock;//LCOV_EXCL_STOP
             }
         }
 
@@ -1558,7 +1558,7 @@ static REDSTATUS BranchBlock(
                   #if DINDIR_POINTERS > 0U
                     if(pInode->uDindirEntry != COORD_ENTRY_INVALID)
                     {
-                        pInode->pDindir->aulEntries[pInode->uDindirEntry] = pInode->ulIndirBlock;
+                        pInode->pDindir->aulEntries[pInode->uDindirEntry] = pInode->ulIndirBlock;//LCOV_EXCL_LINE
                     }
                     else
                   #endif
@@ -1603,8 +1603,8 @@ static REDSTATUS BranchBlock(
                         }
                         else
                         {
-                            CRITICAL_ERROR();
-                            ret = -RED_EFUBAR;
+                            CRITICAL_ERROR();//LCOV_EXCL_LINE
+                            ret = -RED_EFUBAR;//LCOV_EXCL_LINE
                         }
                     }
                   #endif
@@ -1683,7 +1683,7 @@ static REDSTATUS BranchOneBlock(
                     }
                     else
                     {
-                        ret = RedBufferGet(ulPrevBlock, uBFlag | BFLAG_DIRTY, ppBuffer);
+                        ret = RedBufferGet(ulPrevBlock, uBFlag | BFLAG_DIRTY, ppBuffer);//LCOV_EXCL_LINE
                     }
                 }
             }
@@ -1708,8 +1708,8 @@ static REDSTATUS BranchOneBlock(
                                 /*  How could there be an existing buffer when
                                     the block did not exist?
                                 */
-                                REDERROR();
-                                ret = -RED_EINVAL;
+                                REDERROR();//LCOV_EXCL_LINE
+                                ret = -RED_EINVAL;//LCOV_EXCL_LINE
                             }
                             else
                             {
@@ -1800,7 +1800,7 @@ static REDSTATUS BranchBlockCost(
       #if DINDIR_POINTERS > 0U
         if(pInode->uDindirEntry != COORD_ENTRY_INVALID)
         {
-            if(pInode->ulDindirBlock != BLOCK_SPARSE)
+            if(pInode->ulDindirBlock != BLOCK_SPARSE)//LCOV_EXCL_START
             {
                 ret = RedImapBlockState(pInode->ulDindirBlock, &state);
 
@@ -1808,7 +1808,7 @@ static REDSTATUS BranchBlockCost(
                 {
                     /*  Double indirect already branched.
                     */
-                    ulCost--;
+                    ulCost--;//LCOV_EXCL_STOP
                 }
             }
         }
@@ -1819,7 +1819,7 @@ static REDSTATUS BranchBlockCost(
             ulCost--;
         }
 
-        if(ret == 0)
+        if(ret == 0)//LCOV_EXCL_LINE
       #endif
       #if REDCONF_DIRECT_POINTERS < INODE_ENTRIES
         {
@@ -1872,7 +1872,7 @@ static REDSTATUS BranchBlockCost(
             {
                 /*  Not branching this deep.
                 */
-                ulCost--;
+                ulCost--;//LCOV_EXCL_LINE
             }
         }
 

@@ -66,8 +66,8 @@ REDSTATUS RedVolMount(void)
             /*  If we fail to mount, invalidate the buffers to prevent any
                 confusion that could be caused by stale or corrupt metadata.
             */
-            (void)RedBufferDiscardRange(0U, gpRedVolume->ulBlockCount);
-            (void)RedOsBDevClose(gbRedVolNum);
+            (void)RedBufferDiscardRange(0U, gpRedVolume->ulBlockCount);//LCOV_EXCL_LINE
+            (void)RedOsBDevClose(gbRedVolNum);//LCOV_EXCL_LINE
         }
     }
 
@@ -178,7 +178,7 @@ REDSTATUS RedVolMountMetaroot(void)
             MetaRootEndianSwap(&gpRedCoreVol->aMR[0U]);
           #endif
         }
-        else if(gpRedVolConf->fAtomicSectorWrite && !fSectorCRCIsValid)
+        else if(gpRedVolConf->fAtomicSectorWrite && !fSectorCRCIsValid)//LCOV_EXCL_LINE
         {
             ret = -RED_EIO;
         }
@@ -202,7 +202,7 @@ REDSTATUS RedVolMountMetaroot(void)
                     bMR = 1U;
                 }
             }
-            else if(gpRedVolConf->fAtomicSectorWrite && !fSectorCRCIsValid)
+            else if(gpRedVolConf->fAtomicSectorWrite && !fSectorCRCIsValid)//LCOV_EXCL_LINE
             {
                 ret = -RED_EIO;
             }
@@ -302,7 +302,7 @@ static bool MetarootIsValid(
     else if(pMR->hdr.ulSignature != META_SIG_METAROOT)
   #endif
     {
-        *pfSectorCRCIsValid = false;
+        *pfSectorCRCIsValid = false;//LCOV_EXCL_LINE
     }
     else
     {
@@ -328,7 +328,7 @@ static bool MetarootIsValid(
         {
             if(gpRedVolConf->ulSectorSize < REDCONF_BLOCK_SIZE)
             {
-                ulCRC = RedCrc32Update(ulCRC, &pbMR[gpRedVolConf->ulSectorSize], REDCONF_BLOCK_SIZE - gpRedVolConf->ulSectorSize);
+                ulCRC = RedCrc32Update(ulCRC, &pbMR[gpRedVolConf->ulSectorSize], REDCONF_BLOCK_SIZE - gpRedVolConf->ulSectorSize);//LCOV_EXCL_LINE
             }
 
           #ifdef REDCONF_ENDIAN_SWAP
@@ -387,7 +387,7 @@ REDSTATUS RedVolTransact(void)
 
             if(gpRedVolConf->ulSectorSize < REDCONF_BLOCK_SIZE)
             {
-                gpRedMR->hdr.ulCRC = RedCrc32Update(ulSectorCRC, &pbMR[gpRedVolConf->ulSectorSize], REDCONF_BLOCK_SIZE - gpRedVolConf->ulSectorSize);
+                gpRedMR->hdr.ulCRC = RedCrc32Update(ulSectorCRC, &pbMR[gpRedVolConf->ulSectorSize], REDCONF_BLOCK_SIZE - gpRedVolConf->ulSectorSize);//LCOV_EXCL_LINE
             }
             else
             {
@@ -526,8 +526,8 @@ REDSTATUS RedVolSeqNumIncrement(void)
             fires and the current year is still written with four digits,
             suspect memory corruption.
         */
-        CRITICAL_ERROR();
-        ret = -RED_EFUBAR;
+        CRITICAL_ERROR();//LCOV_EXCL_LINE
+        ret = -RED_EFUBAR;//LCOV_EXCL_LINE
     }
     else
     {

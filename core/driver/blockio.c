@@ -79,7 +79,7 @@ REDSTATUS RedIoRead(
         REDASSERT(bSectorShift < 32U);
         REDASSERT((ulSectorCount >> bSectorShift) == ulBlockCount);
 
-        for(bRetryIdx = 0U; bRetryIdx <= gpRedVolConf->bBlockIoRetries; bRetryIdx++)
+        for(bRetryIdx = 0U; bRetryIdx <= gpRedVolConf->bBlockIoRetries; bRetryIdx++)//LCOV_EXCL_LINE
         {
             ret = RedOsBDevRead(bVolNum, ullSectorStart, ulSectorCount, pBuffer);
 
@@ -137,7 +137,7 @@ REDSTATUS RedIoWrite(
         REDASSERT(bSectorShift < 32U);
         REDASSERT((ulSectorCount >> bSectorShift) == ulBlockCount);
 
-        for(bRetryIdx = 0U; bRetryIdx <= gpRedVolConf->bBlockIoRetries; bRetryIdx++)
+        for(bRetryIdx = 0U; bRetryIdx <= gpRedVolConf->bBlockIoRetries; bRetryIdx++)//LCOV_EXCL_LINE
         {
             ret = RedOsBDevWrite(bVolNum, ullSectorStart, ulSectorCount, pBuffer);
 
@@ -179,7 +179,7 @@ REDSTATUS RedIoFlush(
     {
         uint8_t  bRetryIdx;
 
-        for(bRetryIdx = 0U; bRetryIdx <= gpRedVolConf->bBlockIoRetries; bRetryIdx++)
+        for(bRetryIdx = 0U; bRetryIdx <= gpRedVolConf->bBlockIoRetries; bRetryIdx++)//LCOV_EXCL_LINE
         {
             ret = RedOsBDevFlush(bVolNum);
 
