@@ -9,6 +9,41 @@ course of recent releases and a list of known issues.
 
 Release History and Changes
 
+Reliance Edge v2.2.1, June 2018
+
+Common Code Changes
+
+-   Fix bugs in the implementation of the sector offset feature added in
+    Reliance Edge v2.2. Anyone who set the sector offset to a value
+    other than zero is strongly encouraged to upgrade.
+-   Fix a minor bug in the POSIX-like API where operations which are not
+    allowed on the root directory -- such as deleting, renaming, or
+    recreating it -- would set red_errno to RED_EINVAL rather than the
+    appropriate errno value.
+-   Fix a bug in the POSIX-like API Test Suite which caused a link error
+    if relative paths were enabled but rename was disabled.
+-   Fix minor documentation issues.
+
+INTEGRITY Port Changes
+
+-   Minor fixes and enhancements to the INTEGRITY port documentation.
+-   Fix a path problem in the host/Makefile for the bbb-app-unified and
+    bbb-app-clientserv example projects.
+
+FreeRTOS Port Changes
+
+-   Fix a bug in the F_DRIVER example implementation of the block
+    device service. According to the FreeRTOS documentation, the release
+    function pointer in the F_DRIVER structure is allowed to be NULL,
+    but the old code was calling that function unconditionally, without
+    first ensuring it was non-NULL. The updated code will only call
+    release when it is non-NULL.
+
+Linux Port Changes
+
+-   Add support for discards on compatible block devices (commercial
+    kit only).
+
 Reliance Edge v2.2, December 2017
 
 Common Code Changes

@@ -97,7 +97,7 @@ static REDSTATUS DiskOpen(
     REDSTATUS       ret = 0;
     static bool     fSdInitted = false;
 
-    (void) mode;
+    (void)mode;
 
     if(!fSdInitted)
     {
@@ -119,7 +119,6 @@ static REDSTATUS DiskOpen(
     }
     else
     {
-        uint32_t                ulSectorSize = gaRedVolConf[bVolNum].ulSectorSize;
         HAL_SD_CardInfoTypedef  sdCardInfo = {{0}};
 
         BSP_SD_GetCardInfo(&sdCardInfo);
@@ -128,9 +127,11 @@ static REDSTATUS DiskOpen(
             but the interface only supports a 512 byte block size. Further,
             one card has been observed to report a 1024-byte block size,
             but it worked fine with a 512-byte Reliance Edge ulSectorSize.
+
+            Shifting sdCardInfo.CardCapacity does a unit conversion from bytes
+            to 512-byte sectors.
         */
-        if(    (ulSectorSize != 512U)
-            || (sdCardInfo.CardCapacity < (gaRedVolConf[bVolNum].ullSectorCount * ulSectorSize)))
+        if(!VOLUME_SECTOR_GEOMETRY_IS_VALID(bVolNum, 512U, sdCardInfo.CardCapacity >> 9U))
         {
             ret = -RED_EINVAL;
         }
@@ -323,24 +324,6 @@ static REDSTATUS DiskFlush(
     (void)bVolNum;
     return 0;
 }
-
-
-#if REDCONF_DISCARDS == 1
-/** @brief Discard sectors on a disk.
-
-    @param bVolNum          The volume number of the volume whose block device
-                            is being accessed.
-    @param ullSectorStart   The starting sector number.
-    @param ullSectorCount   The number of sectors to discard.
-*/
-static void DiskDiscard(
-    uint8_t     bVolNum,
-    uint64_t    ullSectorStart,
-    uint64_t    ullSectorCount)
-{
-#error "STM32 SDIO block device implementation does not support discards."
-}
-#endif /* REDCONF_DISCARDS == 1 */
 
 
 #if SD_STATUS_TIMEOUT > 0U

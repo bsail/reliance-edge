@@ -266,11 +266,10 @@ REDSTATUS RedOsBDevRead(
     uint32_t    ulSectorCount,
     void       *pBuffer)
 {
-    REDSTATUS   ret = 0;
+    REDSTATUS   ret;
 
     if(    (bVolNum >= REDCONF_VOLUME_COUNT)
-        || (ullSectorStart >= gaRedVolConf[bVolNum].ullSectorCount)
-        || ((gaRedVolConf[bVolNum].ullSectorCount - ullSectorStart) < ulSectorCount)
+        || !VOLUME_SECTOR_RANGE_IS_VALID(bVolNum, ullSectorStart, ulSectorCount)
         || (pBuffer == NULL))
     {
         ret = -RED_EINVAL;
@@ -311,11 +310,10 @@ REDSTATUS RedOsBDevWrite(
     uint32_t    ulSectorCount,
     const void *pBuffer)
 {
-    REDSTATUS   ret = 0;
+    REDSTATUS   ret;
 
     if(    (bVolNum >= REDCONF_VOLUME_COUNT)
-        || (ullSectorStart >= gaRedVolConf[bVolNum].ullSectorCount)
-        || ((gaRedVolConf[bVolNum].ullSectorCount - ullSectorStart) < ulSectorCount)
+        || !VOLUME_SECTOR_RANGE_IS_VALID(bVolNum, ullSectorStart, ulSectorCount)
         || (pBuffer == NULL))
     {
         ret = -RED_EINVAL;

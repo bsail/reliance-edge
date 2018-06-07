@@ -79,8 +79,7 @@ static REDSTATUS DiskOpen(
             iErr = pDriver->getphy(pDriver, &geom);
             if(iErr == 0)
             {
-                if(    (geom.bytes_per_sector != gaRedVolConf[bVolNum].ulSectorSize)
-                    || (geom.number_of_sectors < gaRedVolConf[bVolNum].ullSectorCount))
+                if(!VOLUME_SECTOR_GEOMETRY_IS_VALID(bVolNum, geom.bytes_per_sector, geom.number_of_sectors))
                 {
                     ret = -RED_EINVAL;
                 }
@@ -95,7 +94,7 @@ static REDSTATUS DiskOpen(
                 ret = -RED_EIO;
             }
 
-            if(ret != 0)
+            if((ret != 0) && (pDriver->release != NULL))
             {
                 pDriver->release(pDriver);
             }
@@ -130,7 +129,11 @@ static REDSTATUS DiskClose(
     }
     else
     {
-        gapFDriver[bVolNum]->release(gapFDriver[bVolNum]);
+        if(gapFDriver[bVolNum]->release != NULL)
+        {
+            gapFDriver[bVolNum]->release(gapFDriver[bVolNum]);
+        }
+
         gapFDriver[bVolNum] = NULL;
 
         ret = 0;
@@ -272,24 +275,6 @@ static REDSTATUS DiskFlush(
 
     return ret;
 }
-
-
-#if REDCONF_DISCARDS == 1
-/** @brief Discard sectors on a disk.
-
-    @param bVolNum          The volume number of the volume whose block device
-                            is being accessed.
-    @param ullSectorStart   The starting sector number.
-    @param ullSectorCount   The number of sectors to discard.
-*/
-static void DiskDiscard(
-    uint8_t     bVolNum,
-    uint64_t    ullSectorStart,
-    uint64_t    ullSectorCount)
-{
-#error "F_DRIVER block device interface does not support discards."
-}
-#endif /* REDCONF_DISCARDS == 1 */
 
 #endif /* REDCONF_READ_ONLY == 0 */
 

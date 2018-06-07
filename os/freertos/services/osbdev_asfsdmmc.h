@@ -105,9 +105,12 @@ static REDSTATUS DiskOpen(
             IGNORE_ERRORS(sd_mmc_read_capacity(bVolNum, &ulSectorLast));
 
             /*  The ASF SD/MMC driver only supports 512-byte sectors.
+
+                Note: ulSectorLast is the last addressable sector, need +1 to
+                convert to sector count.  The uint64_t cast is for the edge case
+                where ulSectorLast == UINT32_MAX.
             */
-            if(    (gaRedVolConf[bVolNum].ulSectorSize != 512U)
-                || (((uint64_t)ulSectorLast + 1U) < gaRedVolConf[bVolNum].ullSectorCount))
+            if(!VOLUME_SECTOR_GEOMETRY_IS_VALID(bVolNum, 512U, (uint64_t)ulSectorLast + 1U))
             {
                 ret = -RED_EINVAL;
             }
@@ -260,24 +263,6 @@ static REDSTATUS DiskFlush(
 
     return ret;
 }
-
-
-#if REDCONF_DISCARDS == 1
-/** @brief Discard sectors on a disk.
-
-    @param bVolNum          The volume number of the volume whose block device
-                            is being accessed.
-    @param ullSectorStart   The starting sector number.
-    @param ullSectorCount   The number of sectors to discard.
-*/
-static void DiskDiscard(
-    uint8_t     bVolNum,
-    uint64_t    ullSectorStart,
-    uint64_t    ullSectorCount)
-{
-#error "Atmel Software Framework SD/MMC driver does not support discards."
-}
-#endif /* REDCONF_DISCARDS == 1 */
 
 #endif /* REDCONF_READ_ONLY == 0 */
 

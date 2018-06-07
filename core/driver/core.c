@@ -97,7 +97,8 @@ CONST_IF_ONE_VOLUME uint8_t gbRedVolNum;
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0   Operation was successful.
+    @retval 0           Operation was successful.
+    @retval -RED_EINVAL Invalid configuration parameters.
 */
 REDSTATUS RedCoreInit(void)
 {
@@ -134,6 +135,7 @@ REDSTATUS RedCoreInit(void)
 
         if(    (pVolConf->ulSectorSize < SECTOR_SIZE_MIN)
             || ((REDCONF_BLOCK_SIZE % pVolConf->ulSectorSize) != 0U)
+            || ((UINT64_MAX - pVolConf->ullSectorOffset) < pVolConf->ullSectorCount) /* SectorOffset + SectorCount must not wrap */
             || (pVolConf->ulInodeCount == 0U))
         {
             ret = -RED_EINVAL;

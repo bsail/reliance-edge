@@ -102,6 +102,46 @@
   #define CONST_IF_ONE_VOLUME
 #endif
 
+/*  Block device implementations may choose to validate the sector geometry in
+    VOLCONF against the sector size/count values reported by the storage device.
+    These macros help validate those parameters in a standardized way.
+*/
+
+/** @brief Yields the first sector number beyond the end of the volume.
+
+    RedCoreInit() ensures that SectorOffset + SectorCount will not result in
+    unsigned integer wrap-around.
+*/
+#define VOLUME_SECTOR_LIMIT(volnum) (gaRedVolConf[(volnum)].ullSectorOffset + gaRedVolConf[(volnum)].ullSectorCount)
+
+/** @brief Determine if the sector size reported by the storage device is
+           compatible with the configured volume geometry.
+*/
+#define VOLUME_SECTOR_SIZE_IS_VALID(volnum, devsectsize) ((uint32_t)(devsectsize) == gaRedVolConf[(volnum)].ulSectorSize)
+
+/** @brief Determine if the sector count reported by the storage device is
+           compatible with the configured volume geometry.
+
+    The storage device must be large enough to contain the volume.  If it is
+    bigger than needed, that is _not_ an error: the extra sectors might be in
+    use for other purposes, such as another partititon.
+*/
+#define VOLUME_SECTOR_COUNT_IS_VALID(volnum, devsectcount) ((uint64_t)(devsectcount) >= VOLUME_SECTOR_LIMIT(volnum))
+
+/** @brief Determine if the sector size and sector count reported by the
+           storage device are compatible with the configured volume geometry.
+*/
+#define VOLUME_SECTOR_GEOMETRY_IS_VALID(volnum, devsectsize, devsectcount) \
+    (VOLUME_SECTOR_SIZE_IS_VALID(volnum, devsectsize) && VOLUME_SECTOR_COUNT_IS_VALID(volnum, devsectcount))
+
+/** @brief Ensure a range of sectors is within the boundaries of a volume.
+
+    Assumes the sector offset has already been added into the starting sector.
+*/
+#define VOLUME_SECTOR_RANGE_IS_VALID(volnum, sectstart, sectcount) \
+    (    ((sectstart) >= gaRedVolConf[(volnum)].ullSectorOffset) \
+      && ((sectcount) <= (VOLUME_SECTOR_LIMIT(volnum) - (sectstart))))
+
 
 #endif
 

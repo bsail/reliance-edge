@@ -44,6 +44,7 @@ static uint8_t *gapbRamDisk[REDCONF_VOLUME_COUNT];
     @return A negated ::REDSTATUS code indicating the operation result.
 
     @retval 0           Operation was successful.
+    @retval -RED_EINVAL Invalid sector geometry for a RAM disk.
     @retval -RED_EIO    A disk I/O error occurred.
 */
 static REDSTATUS DiskOpen(
@@ -54,13 +55,27 @@ static REDSTATUS DiskOpen(
 
     (void)mode;
 
-    if(gapbRamDisk[bVolNum] == NULL)
+    if(gaRedVolConf[bVolNum].ullSectorOffset > 0U)
+    {
+        /*  A sector offset makes no sense for a RAM disk.  The feature exists
+            to enable partitioning, but we don't support having more than one
+            file system on a RAM disk.  Thus, having a sector offset would only
+            waste memory by making the RAM disk bigger.
+        */
+        ret = -RED_EINVAL;
+    }
+    else if(gapbRamDisk[bVolNum] == NULL)
     {
         gapbRamDisk[bVolNum] = ALLOCATE_CLEARED_MEMORY(gaRedVolume[bVolNum].ulBlockCount, REDCONF_BLOCK_SIZE);
         if(gapbRamDisk[bVolNum] == NULL)
         {
             ret = -RED_EIO;
         }
+    }
+    else
+    {
+        /*  RAM disk already exists, nothing to do.
+        */
     }
 
     return ret;
@@ -74,7 +89,8 @@ static REDSTATUS DiskOpen(
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0   Operation was successful.
+    @retval 0           Operation was successful.
+    @retval -RED_EINVAL RAM disk has not been created.
 */
 static REDSTATUS DiskClose(
     uint8_t     bVolNum)
@@ -109,7 +125,8 @@ static REDSTATUS DiskClose(
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0   Operation was successful.
+    @retval 0           Operation was successful.
+    @retval -RED_EINVAL RAM disk has not been created.
 */
 static REDSTATUS DiskRead(
     uint8_t     bVolNum,
@@ -149,7 +166,8 @@ static REDSTATUS DiskRead(
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0   Operation was successful.
+    @retval 0           Operation was successful.
+    @retval -RED_EINVAL RAM disk has not been created.
 */
 static REDSTATUS DiskWrite(
     uint8_t     bVolNum,
@@ -184,7 +202,8 @@ static REDSTATUS DiskWrite(
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0   Operation was successful.
+    @retval 0           Operation was successful.
+    @retval -RED_EINVAL RAM disk has not been created.
 */
 static REDSTATUS DiskFlush(
     uint8_t     bVolNum)
@@ -202,28 +221,6 @@ static REDSTATUS DiskFlush(
 
     return ret;
 }
-
-
-#if REDCONF_DISCARDS == 1
-/** @brief Discard sectors on a disk.
-
-    @param bVolNum          The volume number of the volume whose block device
-                            is being accessed.
-    @param ullSectorStart   The starting sector number.
-    @param ullSectorCount   The number of sectors to discard.
-*/
-static void DiskDiscard(
-    uint8_t     bVolNum,
-    uint64_t    ullSectorStart,
-    uint64_t    ullSectorCount)
-{
-/*  A RAM disk has no need for discards, but for testing purposes, a discard
-    could be simulated by memset'ing the affected sectors -- this is left as an
-    exercise to the reader.
-*/
-#error "RAM disk block device does not support discards."
-}
-#endif /* REDCONF_DISCARDS == 1 */
 
 #endif /* REDCONF_READ_ONLY == 0 */
 

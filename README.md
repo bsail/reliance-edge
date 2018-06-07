@@ -25,7 +25,7 @@ from here:
 
 <http://www.datalight.com/reliance-edge>
 
-In addition this README, see doc/release_notes.md for a list of updates
+In addition to this README, see doc/release_notes.md for a list of updates
 to Reliance Edge and a list of known issues. There is also a quick-start
 guide in the doc/ directory that describes step-by-step how to compile
 and run Reliance Edge in a simulated Windows environment.

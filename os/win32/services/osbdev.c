@@ -362,8 +362,7 @@ REDSTATUS RedOsBDevRead(
     if(    (bVolNum >= REDCONF_VOLUME_COUNT)
         || !gaDisk[bVolNum].fOpen
         || (gaDisk[bVolNum].mode == BDEV_O_WRONLY)
-        || (ullSectorStart >= gaRedVolConf[bVolNum].ullSectorCount)
-        || ((gaRedVolConf[bVolNum].ullSectorCount - ullSectorStart) < ulSectorCount)
+        || !VOLUME_SECTOR_RANGE_IS_VALID(bVolNum, ullSectorStart, ulSectorCount)
         || (pBuffer == NULL))
     {
         ret = -RED_EINVAL;
@@ -426,8 +425,7 @@ REDSTATUS RedOsBDevWrite(
     if(    (bVolNum >= REDCONF_VOLUME_COUNT)
         || !gaDisk[bVolNum].fOpen
         || (gaDisk[bVolNum].mode == BDEV_O_RDONLY)
-        || (ullSectorStart >= gaRedVolConf[bVolNum].ullSectorCount)
-        || ((gaRedVolConf[bVolNum].ullSectorCount - ullSectorStart) < ulSectorCount)
+        || !VOLUME_SECTOR_RANGE_IS_VALID(bVolNum, ullSectorStart, ulSectorCount)
         || (pBuffer == NULL))
     {
         ret = -RED_EINVAL;
@@ -526,6 +524,7 @@ REDSTATUS RedOsBDevFlush(
     @return A negated ::REDSTATUS code indicating the operation result.
 
     @retval 0           Operation was successful.
+    @retval -RED_EINVAL Invalid sector geometry for a RAM disk.
     @retval -RED_EIO    A disk I/O error occurred.
 */
 static REDSTATUS RamDiskOpen(
@@ -536,13 +535,27 @@ static REDSTATUS RamDiskOpen(
 
     (void)mode;
 
-    if(gaDisk[bVolNum].pbRamDisk == NULL)
+    if(gaRedVolConf[bVolNum].ullSectorOffset > 0U)
+    {
+        /*  A sector offset makes no sense for a RAM disk.  The feature exists
+            to enable partitioning, but we don't support having more than one
+            file system on a RAM disk.  Thus, having a sector offset would only
+            waste memory by making the RAM disk bigger.
+        */
+        ret = -RED_EINVAL;
+    }
+    else if(gaDisk[bVolNum].pbRamDisk == NULL)
     {
         gaDisk[bVolNum].pbRamDisk = calloc(gaRedVolume[bVolNum].ulBlockCount, REDCONF_BLOCK_SIZE);
         if(gaDisk[bVolNum].pbRamDisk == NULL)
         {
             ret = -RED_EIO;
         }
+    }
+    else
+    {
+        /*  RAM disk already exists, nothing to do.
+        */
     }
 
     return ret;
@@ -580,7 +593,9 @@ static REDSTATUS RamDiskClose(
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0   Operation was successful.
+    @retval 0           Operation was successful.
+    @retval -RED_EIO    If discards and discard verification are enabled, this
+                        indicates that a discarded sector is being read.
 */
 static REDSTATUS RamDiskRead(
     uint8_t     bVolNum,
@@ -843,8 +858,7 @@ static REDSTATUS FileDiskWrite(
 
     @return A negated ::REDSTATUS code indicating the operation result.
 
-    @retval 0           Operation was successful.
-    @retval -RED_EIO    A disk I/O error occurred.
+    @retval 0   Operation was successful.
 */
 static REDSTATUS FileDiskFlush(
     uint8_t     bVolNum)
@@ -1034,8 +1048,7 @@ static REDSTATUS RawDiskOpen(
                 incorrect configuration sector size, but that would involve more
                 conversions.
             */
-            if(    (ullTotalSectors < gaRedVolConf[bVolNum].ullSectorCount)
-                || (geo.Geometry.BytesPerSector != gaRedVolConf[bVolNum].ulSectorSize))
+            if(!VOLUME_SECTOR_GEOMETRY_IS_VALID(bVolNum, geo.Geometry.BytesPerSector, ullTotalSectors))
             {
                 ret = -RED_EINVAL;
             }
