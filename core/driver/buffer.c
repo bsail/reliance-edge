@@ -167,7 +167,7 @@ static void BufferEndianSwapIndir(INDIR *pIndir);
 #endif
 
 
-static BUFFERCTX gBufCtx;
+static BUFFERCTX gBufCtx __attribute__ ((section (".externalram")));
 
 
 /** @brief Initialize the buffers.
