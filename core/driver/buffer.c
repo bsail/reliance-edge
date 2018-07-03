@@ -170,12 +170,12 @@ static void BufferEndianSwapIndir(INDIR *pIndir);
 
 // static BUFFERCTX gBufCtx;
 
-#ifndef TEST
-static BUFFERCTX *gBufCtx = (BUFFERCTX *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER);
-#else
-static BUFFERCTX gBufCtxHolder;
+// #ifndef TEST
+// static BUFFERCTX *gBufCtx = (BUFFERCTX *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER);
+// #else
+static BUFFERCTX gBufCtxHolder __attribute__ ((section (".externalram")));
 static BUFFERCTX *gBufCtx = &gBufCtxHolder;
-#endif
+// #endif
 
 /** @brief Initialize the buffers.
 */
@@ -186,7 +186,7 @@ void RedBufferInit(void)
     // #ifdef TEST
     // RedMemSet(&gBufCtx, 0U, sizeof(gBufCtx));
     // #else
-    RedMemSet(gBufCtx, 0U, BUFFERCTX_SIZE);/* Теперь ведь у нас указатель! */
+    RedMemSet(gBufCtx, 0U, sizeof(gBufCtxHolder)/*BUFFERCTX_SIZE*/);/* Теперь ведь у нас указатель! */
     // #endif
 
 

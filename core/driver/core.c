@@ -61,12 +61,12 @@ static REDSTATUS CoreFileTruncate(uint32_t ulInode, uint64_t ullSize);
 VOLUME gaRedVolume[REDCONF_VOLUME_COUNT];
 // static COREVOLUME gaCoreVol[REDCONF_VOLUME_COUNT];
 
-#ifndef TEST
-static COREVOLUME *gaCoreVol = (COREVOLUME *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER_COREVOL);
-#else
-static COREVOLUME gaCoreVolHolder;
+// #ifndef TEST
+// static COREVOLUME *gaCoreVol = (COREVOLUME *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER_COREVOL);
+// #else
+static COREVOLUME gaCoreVolHolder __attribute__ ((section (".externalram")));
 static COREVOLUME *gaCoreVol = &gaCoreVolHolder;
-#endif
+// #endif
 
 const VOLCONF  * CONST_IF_ONE_VOLUME gpRedVolConf = &gaRedVolConf[0U];
 VOLUME         * CONST_IF_ONE_VOLUME gpRedVolume = &gaRedVolume[0U];
@@ -75,11 +75,11 @@ VOLUME         * CONST_IF_ONE_VOLUME gpRedVolume = &gaRedVolume[0U];
 
 // COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol;// = &gaCoreVol[0U];
 
-#ifndef TEST
-COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol=(COREVOLUME *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER_COREVOL);
-#else
+// #ifndef TEST
+// COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol=(COREVOLUME *) (XMEM_OFFSET + XMEM_RELIANCE_BUFFER_COREVOL);
+// #else
 COREVOLUME     * CONST_IF_ONE_VOLUME gpRedCoreVol = &gaCoreVolHolder;
-#endif
+// #endif
 
 METAROOT       *gpRedMR;// = &gaCoreVol[0U].aMR[0U];
 
