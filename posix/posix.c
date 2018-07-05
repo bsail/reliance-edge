@@ -2709,7 +2709,7 @@ static REDSTATUS PathStartingPoint(
             *pbVolNum = bVolNum;
         }
     }
-    delay(1000);
+    delay(2000);
     return ret;
 }
 
