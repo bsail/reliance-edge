@@ -117,11 +117,6 @@ typedef enum
 
 
 #if REDCONF_API_POSIX_READDIR == 1
-/** @brief Opaque directory handle.
-*/
-typedef struct sREDHANDLE REDDIR;
-
-
 /** @brief Directory entry information.
 */
 typedef struct
@@ -130,6 +125,24 @@ typedef struct
     char        d_name[REDCONF_NAME_MAX+1U];    /**< Name of entry. */
     REDSTAT     d_stat; /**< File information (POSIX extension). */
 } REDDIRENT;
+
+/*  @brief Handle structure, used to implement file descriptors and directory
+           streams.
+*/
+typedef struct sREDHANDLE
+{
+    uint32_t        ulInode;    /**< Inode number; 0 if handle is available. */
+    uint8_t         bVolNum;    /**< Volume containing the inode. */
+    uint8_t         bFlags;     /**< Handle flags (type and mode). */
+    uint64_t        ullOffset;  /**< File or directory offset. */
+  #if REDCONF_API_POSIX_READDIR == 1
+    REDDIRENT       dirent;     /**< Dirent structure returned by red_readdir(). */
+  #endif
+} REDHANDLE;
+
+/** @brief Opaque directory handle.
+*/
+typedef struct sREDHANDLE REDDIR;
 #endif
 
 
