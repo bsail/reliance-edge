@@ -485,7 +485,7 @@ static REDSTATUS Shrink(
 
             if((ret == 0) || (ret == -RED_ENODATA))
             {
-                bool fFreed;
+                bool fFreed = 0;
 
                 /*  TruncDindir() invokes seek as it goes along, which will
                     update the entry values (possibly all three of these);
