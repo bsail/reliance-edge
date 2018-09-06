@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2017 Datalight, Inc.
+                   Copyright (c) 2014-2018 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -148,6 +148,7 @@ typedef struct
     bool        fQuick;         /**< --quick */
     bool        fQuitOnFailure; /**< --quit-on-failure */
     bool        fDebugErrors;   /**< --debug */
+    bool        fNoCorrupt;     /**< --no-corrupt */
 } POSIXTESTPARAM;
 
 PARAMSTATUS RedPosixTestParseParams(int argc, char *argv[], POSIXTESTPARAM *pParam, uint8_t *pbVolNum, const char **ppszDevice);

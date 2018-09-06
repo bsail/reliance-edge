@@ -18,9 +18,17 @@ recent releases and a list of known issues.
 - Fix a bug in the POSIX-like API Test Suite which caused a link error if
   relative paths were enabled but rename was disabled.
 - Fix minor documentation issues.
+- Fix a test bug which was causing the simulated power interruption test in
+  projects/powerint to fail.  This test is only provided with the commercial
+  kit.
 
 #### INTEGRITY Port Changes
 
+- Fix a bug in the block device code which would fail to report an error and
+  leave the sector size uninitialized, later causing a memory violation.
+- Update to support binary and text modes with fopen(), such as "w+b" or "rt".
+  Regardless of open mode, Reliance Edge, like the native file systems, does not
+  perform newline conversions.
 - Minor fixes and enhancements to the INTEGRITY port documentation.
 - Fix a path problem in the `host/Makefile` for the bbb-app-unified and
   bbb-app-clientserv example projects.
@@ -36,6 +44,7 @@ recent releases and a list of known issues.
 #### Linux Port Changes
 
 - Add support for discards on compatible block devices (commercial kit only).
+- Add locking to the FUSE port to fix multithreading issues.
 
 ### Reliance Edge v2.2, December 2017
 
