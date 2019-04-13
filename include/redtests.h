@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -80,6 +80,12 @@
    (    ((RED_KIT == RED_KIT_COMMERCIAL) || (RED_KIT == RED_KIT_SANDBOX)) \
      && (REDCONF_OUTPUT == 1) && (REDCONF_READ_ONLY == 0) && (REDCONF_API_POSIX == 1) \
      && (REDCONF_API_POSIX_FORMAT == 1) && (REDCONF_API_POSIX_FTRUNCATE == 1))
+
+#define MVSTRESSTEST_SUPPORTED \
+   (    ((RED_KIT == RED_KIT_COMMERCIAL) || (RED_KIT == RED_KIT_SANDBOX)) \
+     && (REDCONF_OUTPUT == 1) && (REDCONF_READ_ONLY == 0) && (REDCONF_NAME_MAX >= 8U) \
+     && (REDCONF_API_POSIX == 1) && (REDCONF_API_POSIX_FORMAT == 1) && (REDCONF_API_POSIX_FTRUNCATE == 1) \
+     && (REDCONF_API_POSIX_UNLINK == 1))
 
 
 typedef enum
@@ -229,20 +235,23 @@ int FSIOTestStart(const FSIOTESTPARAM *pParam);
 #if BDEVTEST_SUPPORTED
 typedef struct
 {
-    uint8_t     bDrvNum;        /**< Volume number (for sector size/count). */
-    bool        fSeqWrite;      /**< --seq:w */
-    bool        fSeqRead;       /**< --seq:r */
-    bool        fRandWrite;     /**< --rand:w */
-    bool        fRandRead;      /**< --rand:r */
-    uint32_t    ulSampleSecs;   /**< --sample-rate */
-    uint32_t    ulPasses;       /**< --passes */
-    uint32_t    ulMinIOSectors; /**< --count=min[:max] (min part) */
-    uint32_t    ulMaxIOSectors; /**< --count=min[:max] (max part) */
-    uint32_t    ulMaxSizeKB;    /**< --max */
-    uint32_t    ulTestSeconds;  /**< --time */
-    bool        fVerify;        /**< --verify */
-    bool        fAsyncWrites;   /**< --async */
-    uint64_t    ullSeed;        /**< --seed */
+    uint8_t     bDrvNum;            /**< Volume number (for sector size/count). */
+    bool        fSeqWrite;          /**< --seq:w */
+    bool        fSeqRead;           /**< --seq:r */
+    bool        fSeqDiscard;        /**< --seq:d */
+    bool        fRandWrite;         /**< --rand:w */
+    bool        fRandRead;          /**< --rand:r */
+    bool        fRandDiscard;       /**< --rand:d */
+    uint32_t    ulSampleSecs;       /**< --sample-rate */
+    uint32_t    ulPasses;           /**< --passes */
+    uint32_t    ulMinIOSectors;     /**< --count=min[:max] (min part) */
+    uint32_t    ulMaxIOSectors;     /**< --count=min[:max] (max part) */
+    uint32_t    ulMaxSizeKB;        /**< --max */
+    uint32_t    ulTestSeconds;      /**< --time */
+    bool        fVerify;            /**< --verify */
+    bool        fAsyncWrites;       /**< --async */
+    bool        fNoDiscardMedia;    /**< --no-wipe */
+    uint64_t    ullSeed;            /**< --seed */
 } BDEVTESTPARAM;
 
 PARAMSTATUS BDevTestParseParams(int argc, char *argv[], BDEVTESTPARAM *pParam, uint8_t *pbVolNum, const char **ppszDevice);
@@ -261,6 +270,30 @@ typedef struct
 PARAMSTATUS DiskFullTestParseParams(int argc, char *argv[], DISKFULLTESTPARAM *pParam, uint8_t *pbVolNum, const char **ppszDevice);
 void DiskFullTestDefaultParams(DISKFULLTESTPARAM *pParam);
 int DiskFullTestStart(const DISKFULLTESTPARAM *pParam);
+#endif
+
+#if MVSTRESSTEST_SUPPORTED
+typedef struct
+{
+    uint32_t    ulVolumeCount;  /**< Number of test volumes.  Max value of REDCONF_VOLUME_COUNT. */
+
+    /*  Only the first ulVolumeCount elements in these arrays need to be
+        populated.
+    */
+    const char *apszVolumes[REDCONF_VOLUME_COUNT];  /**< Array of volume names to test. */
+    uint8_t     abVolNum[REDCONF_VOLUME_COUNT];     /**< The volume number associated with the volume name. */
+    const char *apszDevices[REDCONF_VOLUME_COUNT];  /**< If non-NULL, the device string for the volume. */
+
+    uint32_t    ulFilesPerVol;  /**< --file-count*/
+    uint32_t    ulMaxFileSize;  /**< --file-size */
+    uint32_t    ulMaxOpSize;    /**< --buffer-size */
+    uint32_t    ulIterations;   /**< --iterations */
+    uint32_t    ulSeed;         /**< --seed */
+} MVSTRESSTESTPARAM;
+
+PARAMSTATUS MultiVolStressTestParseParams(int argc, char *argv[], MVSTRESSTESTPARAM *pParam);
+void MultiVolStressTestDefaultParams(MVSTRESSTESTPARAM *pParam);
+int MultiVolStressTestStart(const MVSTRESSTESTPARAM *pParam);
 #endif
 
 

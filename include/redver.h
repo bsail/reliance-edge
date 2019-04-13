@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -33,7 +33,7 @@
 
     <!-- This macro is updated automatically: do not edit! -->
 */
-#define RED_BUILD_NUMBER "781"
+#define RED_BUILD_NUMBER "830"
 
 #define RED_KIT_GPL         0U  /* Open source GPL kit. */
 #define RED_KIT_COMMERCIAL  1U  /* Commercially-licensed kit. */
@@ -48,13 +48,13 @@
 
 /** @brief Version number to display in output.
 */
-#define RED_VERSION "v2.2.1"
+#define RED_VERSION "v2.3"
 
 /** @brief Version number in hex.
 
     The most significant byte is the major version number, etc.
 */
-#define RED_VERSION_VAL 0x02020100U
+#define RED_VERSION_VAL 0x02030000U
 
 /** @brief On-disk version number.
 
@@ -88,7 +88,7 @@
 
 /** @brief Product copyright.
 */
-#define RED_PRODUCT_LEGAL "Copyright (c) 2014-2018 Datalight, Inc.  All Rights Reserved Worldwide."
+#define RED_PRODUCT_LEGAL "Copyright (c) 2014-2019 Datalight, Inc.  All Rights Reserved Worldwide."
 
 
 /** @brief Product patents.

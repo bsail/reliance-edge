@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -246,10 +246,11 @@ QString AllSettings::FormatHeaderOutput()
         addTrIfChecked(currValue, allSettings.cbsTrTruncate,
                        (posix && allSettings.cbsPosixFtruncate->GetValue())
                        || (!posix && allSettings.cbsFseTruncate->GetValue()));
-        addTrIfChecked(currValue, allSettings.cbsTrSync, posix);
+        addTrIfChecked(currValue, allSettings.cbsTrFSync, posix);
         addTrIfChecked(currValue, allSettings.cbsTrClose, posix);
         addTrIfChecked(currValue, allSettings.cbsTrVolFull);
         addTrIfChecked(currValue, allSettings.cbsTrUmount);
+        addTrIfChecked(currValue, allSettings.cbsTrSync, posix);
 
         // Ensure some flags were added (currValue was changed)
         if(currValue != rememberCurrVal)
@@ -329,17 +330,17 @@ QString outputIfNotBlank(const QString &macroName, const QString &value,
 // helpful error message.
 static qint32 getMinCompatVer()
 {
-    if(volumeSettings->GetDiscardsSupported())
+    if(allSettings.rbtnsUsePosix->GetValue() && allSettings.cbsTrSync->GetValue())
     {
-        // Discard support added in v1.1; breaks backwards compatibility
-        // only if enabled.
-        return 0x01010000;
+        // sync support added in v2.3; breaks backwards compatibility only if
+        // enabled.
+        return 0x02030000;
     }
     else
     {
-        // Block I/O retries added in v1.0.2. Breaks backwards compatibility
-        // for all configurations.
-        return 0x01000200;
+        // Volume sector offset added in v2.2, which adds a member to the
+        // volume configuration, thus breaking backward compatibility.
+        return 0x02020000;
     }
 }
 
@@ -412,10 +413,11 @@ void AllSettings::GetErrors(QStringList &errors, QStringList &warnings)
     AllSettings::CheckError(allSettings.cbsTrUnlink, errors, warnings);
     AllSettings::CheckError(allSettings.cbsTrWrite, errors, warnings);
     AllSettings::CheckError(allSettings.cbsTrTruncate, errors, warnings);
-    AllSettings::CheckError(allSettings.cbsTrSync, errors, warnings);
+    AllSettings::CheckError(allSettings.cbsTrFSync, errors, warnings);
     AllSettings::CheckError(allSettings.cbsTrClose, errors, warnings);
     AllSettings::CheckError(allSettings.cbsTrVolFull, errors, warnings);
     AllSettings::CheckError(allSettings.cbsTrUmount, errors, warnings);
+    AllSettings::CheckError(allSettings.cbsTrSync, errors, warnings);
 
     Q_ASSERT(volumeSettings != NULL);
     volumeSettings->GetErrors(errors, warnings);
@@ -564,10 +566,11 @@ void AllSettings::ParseHeaderToSettings(const QString &text,
         parseToTrSetting(trText, allSettings.cbsTrUnlink);
         parseToTrSetting(trText, allSettings.cbsTrWrite);
         parseToTrSetting(trText, allSettings.cbsTrTruncate);
-        parseToTrSetting(trText, allSettings.cbsTrSync);
+        parseToTrSetting(trText, allSettings.cbsTrFSync);
         parseToTrSetting(trText, allSettings.cbsTrClose);
         parseToTrSetting(trText, allSettings.cbsTrVolFull);
         parseToTrSetting(trText, allSettings.cbsTrUmount);
+        parseToTrSetting(trText, allSettings.cbsTrSync);
     }
     else //no matches
     {
@@ -763,10 +766,11 @@ void AllSettings::DeleteAll()
     deleteAndNullify(&allSettings.cbsTrUnlink);
     deleteAndNullify(&allSettings.cbsTrWrite);
     deleteAndNullify(&allSettings.cbsTrTruncate);
-    deleteAndNullify(&allSettings.cbsTrSync);
+    deleteAndNullify(&allSettings.cbsTrFSync);
     deleteAndNullify(&allSettings.cbsTrClose);
     deleteAndNullify(&allSettings.cbsTrVolFull);
     deleteAndNullify(&allSettings.cbsTrUmount);
+    deleteAndNullify(&allSettings.cbsTrSync);
 }
 
 
@@ -834,10 +838,11 @@ const QString macroNameTrLink = "RED_TRANSACT_LINK";
 const QString macroNameTrUnlink = "RED_TRANSACT_UNLINK";
 const QString macroNameTrWrite = "RED_TRANSACT_WRITE";
 const QString macroNameTrTruncate = "RED_TRANSACT_TRUNCATE";
-const QString macroNameTrSync = "RED_TRANSACT_FSYNC";
+const QString macroNameTrFSync = "RED_TRANSACT_FSYNC";
 const QString macroNameTrClose = "RED_TRANSACT_CLOSE";
 const QString macroNameTrVolFull = "RED_TRANSACT_VOLFULL";
 const QString macroNameTrUmount = "RED_TRANSACT_UMOUNT";
+const QString macroNameTrSync = "RED_TRANSACT_SYNC";
 
 // Mem & str management function names
 const QString cstdMemcpy = "memcpy";

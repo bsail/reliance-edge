@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -65,6 +65,9 @@
 /** Transact to free space in disk full situations. */
 #define RED_TRANSACT_VOLFULL    0x00000400U
 
+/** Transact after a successful os sync. */
+#define RED_TRANSACT_SYNC       0x00000800U
+
 #if REDCONF_READ_ONLY == 1
 
 /** Mask of all supported automatic transaction events. */
@@ -76,6 +79,7 @@
 */
 #define RED_TRANSACT_MASK                                                   \
 (                                                                           \
+    RED_TRANSACT_SYNC                                                   |   \
     RED_TRANSACT_UMOUNT                                                 |   \
     RED_TRANSACT_CREAT                                                  |   \
     ((REDCONF_API_POSIX_UNLINK    == 1) ? RED_TRANSACT_UNLINK   : 0U)   |   \

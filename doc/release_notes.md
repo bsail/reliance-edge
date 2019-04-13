@@ -5,6 +5,35 @@ recent releases and a list of known issues.
 
 ## Release History and Changes
 
+### Reliance Edge v2.3, January 2019
+
+#### Common Code Changes
+
+- Add support for red_sync() to the POSIX-like API, including the new
+  `RED_TRANSACT_SYNC` automatic transaction flag and requisite configuration
+  option in the Reliance Edge Configuration Utility.
+- Add discard testing to BDevTest (available in the commercial kit).
+- Fix bugs affecting multivolume use cases caused by incorrect use of
+  "current volume" global variables.  These bugs could cause spurious I/O
+  errors and metadata corruption.
+- Fix a bug in checker (available in the commercial kit): an array indexing
+  error would cause the wrong link count to be printed when link count
+  corruption was detected.
+
+#### INTEGRITY Port Changes
+
+- Add support for the storage driver API introduced in INTEGRITY v11.7.
+- Add INTEGRITY v11.7.x-compatible example projects for the INTEGRITY ARM
+  Simulator and the Renesas R-Car H3 Starter Kit.
+- Instead of unconditionally transacting all volumes, the INTEGRITY sync()
+  system call now calls red_sync().  Transactions will only be performed on
+  volumes which set the `RED_TRANSACT_SYNC` automatic transaction flag.
+- Fixed a bug which resulted in errors when mounting more than one volume.
+- An `EINVAL` error is now returned by `mount()` if the Reliance Edge mount
+  point does not start with "//".  Because of how INTEGRITY parses paths, the
+  "//" has always been required; and while this was documented, it was not
+  enforced in the code, which could lead to subtle errors.
+
 ### Reliance Edge v2.2.1, June 2018
 
 #### Common Code Changes
@@ -237,13 +266,4 @@ recent releases and a list of known issues.
 ### Reliance Edge v0.9 (Beta), April 2015
 
 First public release.
-
-## Known Issues
-
-### Visual Studio 2005
-
-The Reliance Edge Win32 port (used for the host tools and the Win32 test
-project) cannot be compiled by Visual Studio 2005.  This is not going to be
-fixed since VS2005 is an old toolset.  Newer versions of Visual Studio, starting
-with Visual Studio 2008, work just fine.
 

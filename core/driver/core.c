@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -549,6 +549,7 @@ REDSTATUS RedCoreVolStat(
 
     The following events are available when using the POSIX-like API:
 
+    - #RED_TRANSACT_SYNC
     - #RED_TRANSACT_UMOUNT
     - #RED_TRANSACT_CREAT
     - #RED_TRANSACT_UNLINK

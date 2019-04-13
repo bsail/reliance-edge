@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -147,10 +147,11 @@ struct AllSettings
     CbSetting *cbsTrUnlink;
     CbSetting *cbsTrWrite;
     CbSetting *cbsTrTruncate;
-    CbSetting *cbsTrSync;
+    CbSetting *cbsTrFSync;
     CbSetting *cbsTrClose;
     CbSetting *cbsTrVolFull;
     CbSetting *cbsTrUmount;
+    CbSetting *cbsTrSync;
 };
 
 extern const QString macroNameReadonly;
@@ -217,10 +218,11 @@ extern const QString macroNameTrLink;
 extern const QString macroNameTrUnlink;
 extern const QString macroNameTrWrite;
 extern const QString macroNameTrTruncate;
-extern const QString macroNameTrSync;
+extern const QString macroNameTrFSync;
 extern const QString macroNameTrClose;
 extern const QString macroNameTrVolFull;
 extern const QString macroNameTrUmount;
+extern const QString macroNameTrSync;
 
 // Mem & str management function names
 extern const QString cstdMemcpy;

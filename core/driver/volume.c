@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -246,7 +246,7 @@ REDSTATUS RedVolMountMetaroot(void)
             giving the next node written to disk the same sequence number as the
             metaroot, increment it here.
         */
-        ret = RedVolSeqNumIncrement();
+        ret = RedVolSeqNumIncrement(gbRedVolNum);
     }
 
     if(ret == 0)
@@ -369,7 +369,7 @@ REDSTATUS RedVolTransact(void)
             gpRedMR->hdr.ulSignature = META_SIG_METAROOT;
             gpRedMR->hdr.ullSequence = gpRedVolume->ullSequence;
 
-            ret = RedVolSeqNumIncrement();
+            ret = RedVolSeqNumIncrement(gbRedVolNum);
         }
 
         if(ret == 0)
@@ -508,17 +508,26 @@ void RedVolCriticalError(
 
 /** @brief Increment the sequence number.
 
+    @param bVolNum  Volume number of the volume whose sequence number is to be
+                    incremented.
+
     @return A negated ::REDSTATUS code indicating the operation result.
 
     @retval 0           Operation was successful.
     @retval -RED_EINVAL Cannot increment sequence number: maximum value reached.
                         This should not ever happen.
 */
-REDSTATUS RedVolSeqNumIncrement(void)
+REDSTATUS RedVolSeqNumIncrement(
+    uint8_t     bVolNum)
 {
-    REDSTATUS ret;
+    REDSTATUS   ret;
 
-    if(gpRedVolume->ullSequence == UINT64_MAX)
+    if(bVolNum >= REDCONF_VOLUME_COUNT)
+    {
+        REDERROR();
+        ret = -RED_EINVAL;
+    }
+    else if(gaRedVolume[bVolNum].ullSequence == UINT64_MAX)
     {
         /*  In practice this should never, ever happen; to get here, there would
             need to be UINT64_MAX disk writes, which would take eons: longer
@@ -531,7 +540,7 @@ REDSTATUS RedVolSeqNumIncrement(void)
     }
     else
     {
-        gpRedVolume->ullSequence++;
+        gaRedVolume[bVolNum].ullSequence++;
         ret = 0;
     }
 

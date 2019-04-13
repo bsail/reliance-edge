@@ -1,6 +1,6 @@
 /*             ----> DO NOT REMOVE THE FOLLOWING NOTICE <----
 
-                   Copyright (c) 2014-2018 Datalight, Inc.
+                   Copyright (c) 2014-2019 Datalight, Inc.
                        All Rights Reserved Worldwide.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 /*  Businesses and individuals that for commercial or other reasons cannot
-    comply with the terms of the GPLv2 license may obtain a commercial license
+    comply with the terms of the GPLv2 license must obtain a commercial license
     before incorporating Reliance Edge into proprietary software for
     distribution in any form.  Visit http://www.datalight.com/reliance-edge for
     more information.
@@ -161,6 +161,9 @@ int32_t red_settransmask(const char *pszVolume, uint32_t ulEventMask);
 #endif
 int32_t red_gettransmask(const char *pszVolume, uint32_t *pulEventMask);
 int32_t red_statvfs(const char *pszVolume, REDSTATFS *pStatvfs);
+#if REDCONF_READ_ONLY == 0
+int32_t red_sync(void);
+#endif
 int32_t red_open(const char *pszPath, uint32_t ulOpenMode);
 #if (REDCONF_READ_ONLY == 0) && (REDCONF_API_POSIX_UNLINK == 1)
 int32_t red_unlink(const char *pszPath);
