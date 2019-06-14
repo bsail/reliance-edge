@@ -166,8 +166,11 @@ static void BufferEndianSwapInode(INODE *pInode);
 static void BufferEndianSwapIndir(INDIR *pIndir);
 #endif
 
-
+#if defined(ARDUINO)
 static BUFFERCTX gBufCtx __attribute__ ((section (".externalram")));
+#else
+static BUFFERCTX gBufCtx;
+#endif
 
 
 /** @brief Initialize the buffers.
