@@ -2782,7 +2782,9 @@ static REDSTATUS PathStartingPoint(
             *pbVolNum = bVolNum;
         }
     }
+#if defined(ARDUINO)
     delay(2000);
+#endif
     return ret;
 }
 
