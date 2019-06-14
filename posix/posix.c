@@ -38,7 +38,9 @@
 #include <redcoreapi.h>
 #include <redposix.h>
 #include <redpath.h>
-
+#if defined(ARDUINO)
+#include <subsystems/avr/Arduino.h>
+#endif
 
 /*-------------------------------------------------------------------
     File Descriptors
