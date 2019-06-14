@@ -58,7 +58,11 @@ static REDSTATUS CoreFileTruncate(uint32_t ulInode, uint64_t ullSize);
 
 
 VOLUME gaRedVolume[REDCONF_VOLUME_COUNT];
+#if defined(ARDUINO)
 static COREVOLUME gaCoreVol[REDCONF_VOLUME_COUNT] __attribute__ ((section (".externalram")));
+#else
+static COREVOLUME gaCoreVol[REDCONF_VOLUME_COUNT];
+#endif
 
 const VOLCONF  * CONST_IF_ONE_VOLUME gpRedVolConf = &gaRedVolConf[0U];
 VOLUME         * CONST_IF_ONE_VOLUME gpRedVolume = &gaRedVolume[0U];
